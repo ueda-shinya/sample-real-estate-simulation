@@ -3,19 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>坪・平米(㎡)・畳数 計算ツール サンプル</title>
+  <title>住宅ローン控除 シミュレーター サンプル</title>
   <style>
     :root {
-      --color-bg: #f6f8fc;
+      --color-bg: #f4f8ff;
       --color-surface: #ffffff;
       --color-surface-sub: #f8fbff;
       --color-border: #d8e1ee;
       --color-text: #1f2937;
       --color-text-sub: #5b6472;
-      --color-primary: #ea580c;
-      --color-primary-dark: #c2410c;
-      --color-accent: #fff7ed;
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-accent: #eff6ff;
       --color-danger: #b91c1c;
+      --color-success: #065f46;
       --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
       --radius-lg: 20px;
       --radius-md: 14px;
@@ -28,22 +29,22 @@
       margin: 0;
       font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
       color: var(--color-text);
-      background: linear-gradient(180deg, #fff1e7 0%, var(--color-bg) 220px, var(--color-bg) 100%);
+      background: linear-gradient(180deg, #eaf2ff 0%, var(--color-bg) 220px, var(--color-bg) 100%);
       line-height: 1.7;
     }
 
     button, input, select { font: inherit; }
 
     .l-page {
-      width: min(1120px, calc(100% - 32px));
+      width: min(1220px, calc(100% - 32px));
       margin-inline: auto;
       padding: 32px 0 64px;
     }
 
     .c-hero {
       margin-bottom: 24px;
-      background: linear-gradient(135deg, #ffffff 0%, #fff7f0 100%);
-      border: 1px solid rgba(234, 88, 12, 0.12);
+      background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
+      border: 1px solid rgba(37, 99, 235, 0.12);
       border-radius: 28px;
       box-shadow: var(--shadow-card);
       padding: 28px;
@@ -64,7 +65,7 @@
 
     .c-hero__title {
       margin: 16px 0 12px;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
       line-height: 1.3;
     }
 
@@ -75,7 +76,7 @@
 
     .c-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(330px, 0.95fr);
+      grid-template-columns: minmax(0, 1.06fr) minmax(360px, 0.94fr);
       gap: 24px;
       align-items: start;
     }
@@ -105,7 +106,29 @@
 
     .c-form {
       display: grid;
+      gap: 24px;
+    }
+
+    .c-fieldset {
+      margin: 0;
+      padding: 20px;
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      display: grid;
       gap: 18px;
+      background: var(--color-surface-sub);
+    }
+
+    .c-fieldset__title {
+      margin: 0;
+      font-size: 1.04rem;
+      font-weight: 800;
+    }
+
+    .c-fieldset__lead {
+      margin: -8px 0 0;
+      color: var(--color-text-sub);
+      font-size: 0.88rem;
     }
 
     .c-field {
@@ -132,8 +155,12 @@
 
     .c-form__row {
       display: grid;
-      grid-template-columns: minmax(190px, 0.7fr) minmax(0, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
+    }
+
+    .c-form__row--triple {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .c-input,
@@ -152,14 +179,14 @@
     .c-select:focus {
       outline: none;
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.14);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
     }
 
     .c-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      padding-top: 6px;
+      padding-top: 4px;
     }
 
     .c-button {
@@ -183,7 +210,7 @@
     .c-button--primary:hover { background: var(--color-primary-dark); }
 
     .c-button--secondary {
-      background: #ffedd5;
+      background: #e8efff;
       color: var(--color-primary-dark);
     }
 
@@ -197,8 +224,8 @@
       margin-bottom: 18px;
       padding: 18px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #fff3e9 0%, #fffdfa 100%);
-      border: 1px solid #ffd9bf;
+      background: linear-gradient(135deg, #eef5ff 0%, #fbfdff 100%);
+      border: 1px solid #d6e5ff;
     }
 
     .c-summary__label {
@@ -253,6 +280,23 @@
       white-space: nowrap;
     }
 
+    .c-status {
+      margin: 0 0 18px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: #ecfdf5;
+      color: var(--color-success);
+      border: 1px solid #a7f3d0;
+    }
+
+    .c-status.is-error {
+      background: #fef2f2;
+      color: var(--color-danger);
+      border-color: #fecaca;
+    }
+
     .c-note {
       margin: 0;
       color: var(--color-text-sub);
@@ -274,16 +318,22 @@
 
     .c-table th,
     .c-table td {
-      padding: 14px 16px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--color-border);
       text-align: left;
       vertical-align: top;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
 
     .c-table th {
-      background: #fff7ed;
+      background: #f5f9ff;
       font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .c-table td:last-child,
+    .c-table th:last-child {
+      text-align: right;
     }
 
     .c-table tr:last-child td { border-bottom: none; }
@@ -312,15 +362,16 @@
       font-weight: 700;
     }
 
-    @media (max-width: 920px) {
+    @media (max-width: 980px) {
       .c-grid { grid-template-columns: 1fr; }
       .c-resultCard { position: static; }
     }
 
-    @media (max-width: 640px) {
-      .l-page { width: min(100% - 20px, 1120px); padding-top: 20px; }
+    @media (max-width: 720px) {
+      .l-page { width: min(100% - 20px, 1220px); padding-top: 20px; }
       .c-hero, .c-panel, .c-resultCard { padding: 20px; }
-      .c-form__row { grid-template-columns: 1fr; }
+      .c-form__row,
+      .c-form__row--triple { grid-template-columns: 1fr; }
       .c-actions { flex-direction: column; }
       .c-button { width: 100%; }
     }
@@ -330,126 +381,319 @@
   <main class="l-page">
     <section class="c-hero" aria-labelledby="hero-title">
       <span class="c-hero__badge">SAMPLE PAGE</span>
-      <h1 class="c-hero__title" id="hero-title">坪・平米(㎡)・畳数 計算ツール</h1>
+      <h1 class="c-hero__title" id="hero-title">住宅ローン控除 シミュレーター</h1>
       <p class="c-hero__lead">
-        参照ページは、坪・平米・畳数の換算ツールとして公開されており、1坪 = 約3.30579㎡の換算を案内しています。今回はサンプルページとして、入力単位を選ぶだけで3つの単位をまとめて表示する、使いやすい簡易版にしています。 ([o-uccino.com](https://o-uccino.com/front/tool/area_unit/?utm_source=chatgpt.com))
+        できるだけ実務に近づけたサンプル版です。住宅ローン減税は、年末ローン残高の 0.7% を基礎に、住宅区分・性能区分・入居年・世帯区分・床面積・所得要件などで借入限度額や適用可否が変わります。2026年以降は2030年末入居まで延長され、既存住宅の拡充や子育て世帯・若者夫婦世帯の上乗せが案内されています。 ([mlit.go.jp](https://www.mlit.go.jp/report/press/house02_hh_000241.html?utm_source=chatgpt.com))
       </p>
     </section>
 
     <div class="c-grid">
       <section class="c-card c-panel" aria-labelledby="form-title">
-        <h2 class="c-panel__title" id="form-title">面積を入力してください</h2>
+        <h2 class="c-panel__title" id="form-title">条件を入力してください</h2>
         <p class="c-panel__lead">
-          面積の単位を「平米（㎡）」「坪」「畳」から選び、数値を入力してください。入力した単位をもとに、他の単位へ自動換算します。
+          このサンプルでは、借入額・金利・返済年数から年末残高の推移を作り、各年の住宅ローン控除額を概算します。税額控除の上限は、所得税・住民税の実額が人ごとに違うため、年間上限額を入力する方式にしています。
         </p>
 
-        <form class="c-form" id="areaUnitForm" novalidate>
-          <div class="c-field">
-            <div class="c-field__head">
-              <label class="c-field__label" for="inputUnit">入力単位</label>
-              <span class="c-field__hint">使いやすい単位を選択</span>
-            </div>
-            <select class="c-select js-required" id="inputUnit" name="inputUnit" aria-describedby="inputUnitError">
-              <option value="sqm">平米（㎡）</option>
-              <option value="tsubo">坪</option>
-              <option value="jo">畳</option>
-            </select>
-            <p class="c-error u-hidden" id="inputUnitError"></p>
-          </div>
+        <form class="c-form" id="housingLoanForm" novalidate>
+          <fieldset class="c-fieldset">
+            <legend class="c-fieldset__title">1. ローン条件</legend>
+            <p class="c-fieldset__lead">元利均等返済を前提に、年末残高の推移を計算します。</p>
 
-          <div class="c-field">
-            <div class="c-field__head">
-              <label class="c-field__label" for="inputValue">面積</label>
-              <span class="c-field__hint" id="inputValueHint">㎡で入力</span>
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="loanAmount">借入額</label>
+                  <span class="c-field__hint">万円で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="loanAmount" name="loanAmount" type="number" inputmode="decimal" min="0" step="1" value="4200" aria-describedby="loanAmountError">
+                <p class="c-error u-hidden" id="loanAmountError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="interestRate">年利</label>
+                  <span class="c-field__hint">%で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="interestRate" name="interestRate" type="number" inputmode="decimal" min="0" step="0.01" value="0.68" aria-describedby="interestRateError">
+                <p class="c-error u-hidden" id="interestRateError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="repaymentYears">返済年数</label>
+                  <span class="c-field__hint">年</span>
+                </div>
+                <input class="c-input js-required js-number" id="repaymentYears" name="repaymentYears" type="number" inputmode="numeric" min="1" step="1" value="35" aria-describedby="repaymentYearsError">
+                <p class="c-error u-hidden" id="repaymentYearsError"></p>
+              </div>
             </div>
-            <input class="c-input js-required js-number" id="inputValue" name="inputValue" type="number" inputmode="decimal" min="0" step="0.01" value="72.50" aria-describedby="inputValueError">
-            <p class="c-error u-hidden" id="inputValueError"></p>
-          </div>
+          </fieldset>
+
+          <fieldset class="c-fieldset">
+            <legend class="c-fieldset__title">2. 住宅・世帯条件</legend>
+            <p class="c-fieldset__lead">国土交通省の2026〜2030年向け資料に基づく借入限度額テーブルを反映しています。 ([mlit.go.jp](https://www.mlit.go.jp/page/content/001975402.pdf))</p>
+
+            <div class="c-form__row">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="acquisitionType">取得区分</label>
+                  <span class="c-field__hint">借入限度額・控除期間に使用</span>
+                </div>
+                <select class="c-select js-required" id="acquisitionType" name="acquisitionType" aria-describedby="acquisitionTypeError">
+                  <option value="new">新築住宅</option>
+                  <option value="used">既存住宅</option>
+                  <option value="reform">リフォーム</option>
+                </select>
+                <p class="c-error u-hidden" id="acquisitionTypeError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="performanceType">性能区分</label>
+                  <span class="c-field__hint">リフォーム時は参考表示</span>
+                </div>
+                <select class="c-select js-required" id="performanceType" name="performanceType" aria-describedby="performanceTypeError">
+                  <option value="longterm">長期優良住宅・低炭素住宅</option>
+                  <option value="zeh">ZEH水準省エネ住宅</option>
+                  <option value="standard">省エネ基準適合住宅</option>
+                  <option value="other">その他住宅</option>
+                </select>
+                <p class="c-error u-hidden" id="performanceTypeError"></p>
+              </div>
+            </div>
+
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="householdType">世帯区分</label>
+                  <span class="c-field__hint">上乗せ措置の判定</span>
+                </div>
+                <select class="c-select js-required" id="householdType" name="householdType" aria-describedby="householdTypeError">
+                  <option value="general">一般世帯</option>
+                  <option value="family">子育て世帯・若者夫婦世帯</option>
+                </select>
+                <p class="c-error u-hidden" id="householdTypeError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="occupancyYear">入居年</label>
+                  <span class="c-field__hint">2026〜2030</span>
+                </div>
+                <select class="c-select js-required" id="occupancyYear" name="occupancyYear" aria-describedby="occupancyYearError">
+                  <option value="2026">2026年</option>
+                  <option value="2027">2027年</option>
+                  <option value="2028">2028年</option>
+                  <option value="2029">2029年</option>
+                  <option value="2030">2030年</option>
+                </select>
+                <p class="c-error u-hidden" id="occupancyYearError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="floorArea">床面積</label>
+                  <span class="c-field__hint">㎡で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="floorArea" name="floorArea" type="number" inputmode="decimal" min="0" step="0.1" value="75" aria-describedby="floorAreaError">
+                <p class="c-error u-hidden" id="floorAreaError"></p>
+              </div>
+            </div>
+
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="incomeAmount">合計所得金額</label>
+                  <span class="c-field__hint">万円で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="incomeAmount" name="incomeAmount" type="number" inputmode="decimal" min="0" step="1" value="850" aria-describedby="incomeAmountError">
+                <p class="c-error u-hidden" id="incomeAmountError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="confirmBy2027">2027年末までに建築確認</label>
+                  <span class="c-field__hint">新築・省エネ基準用</span>
+                </div>
+                <select class="c-select js-required" id="confirmBy2027" name="confirmBy2027" aria-describedby="confirmBy2027Error">
+                  <option value="yes">はい</option>
+                  <option value="no">いいえ</option>
+                </select>
+                <p class="c-error u-hidden" id="confirmBy2027Error"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="redZone">災害レッドゾーンの新築住宅</label>
+                  <span class="c-field__hint">2028年以降の新築に影響</span>
+                </div>
+                <select class="c-select js-required" id="redZone" name="redZone" aria-describedby="redZoneError">
+                  <option value="no">いいえ</option>
+                  <option value="yes">はい</option>
+                </select>
+                <p class="c-error u-hidden" id="redZoneError"></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="c-fieldset">
+            <legend class="c-fieldset__title">3. 税額上限</legend>
+            <p class="c-fieldset__lead">実際の控除額は、その年の所得税額と住民税の控除可能額に制限されます。ここでは毎年同じ上限と仮定します。国税庁も、所得税から控除しきれなかった場合は翌年度の個人住民税から控除できる場合があると案内しています。 ([nta.go.jp](https://www.nta.go.jp/taxes/shiraberu/shinkoku/qa/02.htm?utm_source=chatgpt.com))</p>
+
+            <div class="c-form__row">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="incomeTaxCap">年間の所得税控除上限</label>
+                  <span class="c-field__hint">円で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="incomeTaxCap" name="incomeTaxCap" type="number" inputmode="numeric" min="0" step="1000" value="180000" aria-describedby="incomeTaxCapError">
+                <p class="c-error u-hidden" id="incomeTaxCapError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="residentTaxCap">年間の住民税控除上限</label>
+                  <span class="c-field__hint">円で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="residentTaxCap" name="residentTaxCap" type="number" inputmode="numeric" min="0" step="1000" value="97500" aria-describedby="residentTaxCapError">
+                <p class="c-error u-hidden" id="residentTaxCapError"></p>
+              </div>
+            </div>
+          </fieldset>
 
           <div class="c-actions">
-            <button class="c-button c-button--primary" type="submit">換算する</button>
+            <button class="c-button c-button--primary" type="submit">控除額を計算する</button>
             <button class="c-button c-button--secondary" type="button" id="resetButton">初期値に戻す</button>
           </div>
         </form>
       </section>
 
       <aside class="c-card c-resultCard" aria-labelledby="result-title">
-        <h2 class="c-panel__title" id="result-title">換算結果</h2>
-        <p class="c-panel__lead">入力した単位をもとに、3つの単位をまとめて表示します。</p>
+        <h2 class="c-panel__title" id="result-title">計算結果</h2>
+        <p class="c-panel__lead">年ごとの年末残高を使って、各年の控除額を計算しています。</p>
+
+        <p class="c-status" id="statusMessage">適用可否を判定中です。</p>
 
         <div class="c-summary" aria-live="polite" aria-atomic="true">
-          <p class="c-summary__label">入力した値</p>
-          <p class="c-summary__value" id="resultSummaryValue">-</p>
+          <p class="c-summary__label">控除期間合計の概算</p>
+          <p class="c-summary__value" id="totalDeductionView">-</p>
         </div>
 
         <div class="c-breakdown">
           <div class="c-breakdown__item">
             <div>
-              <p class="c-breakdown__term">入力単位</p>
-              <p class="c-breakdown__desc">選択した基準単位です。</p>
+              <p class="c-breakdown__term">1年目の概算控除額</p>
+              <p class="c-breakdown__desc">1年目の年末残高を基準に計算</p>
             </div>
-            <div class="c-breakdown__value" id="inputUnitView">-</div>
+            <div class="c-breakdown__value" id="firstYearDeductionView">-</div>
           </div>
           <div class="c-breakdown__item">
             <div>
-              <p class="c-breakdown__term">平米数</p>
-              <p class="c-breakdown__desc">㎡換算した値です。</p>
+              <p class="c-breakdown__term">適用した借入限度額</p>
+              <p class="c-breakdown__desc">住宅区分・性能区分・入居年等から判定</p>
             </div>
-            <div class="c-breakdown__value" id="sqmView">-</div>
+            <div class="c-breakdown__value" id="loanLimitView">-</div>
           </div>
           <div class="c-breakdown__item">
             <div>
-              <p class="c-breakdown__term">坪数</p>
-              <p class="c-breakdown__desc">1坪 = 3.30579㎡で換算しています。</p>
+              <p class="c-breakdown__term">控除期間</p>
+              <p class="c-breakdown__desc">制度上の年数と返済年数の短い方</p>
             </div>
-            <div class="c-breakdown__value" id="tsuboView">-</div>
+            <div class="c-breakdown__value" id="periodView">-</div>
           </div>
           <div class="c-breakdown__item">
             <div>
-              <p class="c-breakdown__term">畳数</p>
-              <p class="c-breakdown__desc">1畳 = 1.62㎡の簡易換算です。</p>
+              <p class="c-breakdown__term">年間税額上限</p>
+              <p class="c-breakdown__desc">所得税 + 住民税の入力上限</p>
             </div>
-            <div class="c-breakdown__value" id="joView">-</div>
+            <div class="c-breakdown__value" id="taxCapView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">月額返済額の概算</p>
+              <p class="c-breakdown__desc">元利均等返済の計算結果</p>
+            </div>
+            <div class="c-breakdown__value" id="monthlyPaymentView">-</div>
           </div>
         </div>
 
-        <p class="c-note" id="formulaNote">1坪 = 3.30579㎡、1畳 = 1.62㎡として換算しています。</p>
+        <p class="c-note" id="resultNote">このサンプルは、制度理解と導線確認のための概算モデルです。</p>
       </aside>
     </div>
 
+    <section class="c-card c-panel" aria-labelledby="schedule-title" style="margin-top:24px;">
+      <h2 class="c-panel__title" id="schedule-title">年ごとの概算スケジュール</h2>
+      <p class="c-panel__lead">各年の年末残高、0.7%基礎額、税額上限適用後の控除額を一覧表示します。</p>
+      <div class="c-tableWrap">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>年</th>
+              <th>年末残高</th>
+              <th>控除基礎額</th>
+              <th>実際の控除額</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody">
+            <tr>
+              <td colspan="4">計算するとここに表示されます。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="c-card c-panel" aria-labelledby="guide-title" style="margin-top:24px;">
-      <h2 class="c-panel__title" id="guide-title">換算の考え方</h2>
-      <p class="c-panel__lead">
-        参照ページでも坪と平米の換算式が案内されています。このサンプルでは、そこに畳数も加えて、入力単位を起点に一括表示する構成にしています。坪と平米の換算値は参照ページの案内に合わせています。 ([o-uccino.com](https://o-uccino.com/front/tool/area_unit/?utm_source=chatgpt.com))
-      </p>
+      <h2 class="c-panel__title" id="guide-title">このサンプルで反映している主な制度条件</h2>
       <div class="c-tableWrap">
         <table class="c-table">
           <thead>
             <tr>
               <th>項目</th>
-              <th>計算式</th>
+              <th>反映内容</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>坪 → 平米</td>
-              <td>坪数 × 3.30579</td>
+              <td>控除率</td>
+              <td>0.7%</td>
             </tr>
             <tr>
-              <td>平米 → 坪</td>
-              <td>平米数 ÷ 3.30579</td>
+              <td>2026〜2030年の借入限度額</td>
+              <td>国土交通省の令和8年度税制改正資料の表を反映</td>
             </tr>
             <tr>
-              <td>平米 → 畳</td>
-              <td>平米数 ÷ 1.62</td>
+              <td>新築・省エネ基準適合住宅</td>
+              <td>2028年以降は原則対象外。ただし2027年末までに建築確認を受けたもの等は2,000万円（子育て世帯等は3,000万円）×10年</td>
             </tr>
             <tr>
-              <td>畳 → 平米</td>
-              <td>畳数 × 1.62</td>
+              <td>新築・その他住宅</td>
+              <td>支援対象外</td>
+            </tr>
+            <tr>
+              <td>既存住宅</td>
+              <td>性能に応じて13年または10年。その他住宅は2,000万円×10年</td>
+            </tr>
+            <tr>
+              <td>リフォーム</td>
+              <td>2,000万円×10年</td>
+            </tr>
+            <tr>
+              <td>床面積要件</td>
+              <td>40㎡以上。ただし所得1,000万円超または子育て世帯等の上乗せ措置利用者は50㎡以上</td>
+            </tr>
+            <tr>
+              <td>所得要件</td>
+              <td>合計所得金額2,000万円以下</td>
+            </tr>
+            <tr>
+              <td>立地要件</td>
+              <td>2028年以降入居分から、災害レッドゾーンの新築住宅は対象外</td>
             </tr>
           </tbody>
         </table>
       </div>
+      <p class="c-note" style="margin-top:14px;">なお、本番版として厳密性をさらに上げるなら、共有名義・ペアローン、入居月、実際の年末残高証明書ベースの各年残高、各年の所得税額・住民税額の変動、買取再販の詳細区分などを追加するのが次の段階です。制度の基礎条件は国土交通省資料を参照しています。 ([mlit.go.jp](https://www.mlit.go.jp/report/press/house02_hh_000241.html?utm_source=chatgpt.com))</p>
     </section>
   </main>
 
@@ -457,26 +701,62 @@
     (function () {
       'use strict';
 
-      const TSUBO_TO_SQM = 3.30579;
-      const JO_TO_SQM = 1.62;
-      const form = document.getElementById('areaUnitForm');
+      const form = document.getElementById('housingLoanForm');
       const resetButton = document.getElementById('resetButton');
-      const inputUnit = document.getElementById('inputUnit');
-      const inputValue = document.getElementById('inputValue');
-      const inputValueHint = document.getElementById('inputValueHint');
+      const scheduleBody = document.getElementById('scheduleBody');
+      const acquisitionType = document.getElementById('acquisitionType');
+      const performanceType = document.getElementById('performanceType');
 
       const defaultValues = {
-        inputUnit: 'sqm',
-        inputValue: '72.50'
+        loanAmount: '4200',
+        interestRate: '0.68',
+        repaymentYears: '35',
+        acquisitionType: 'new',
+        performanceType: 'zeh',
+        householdType: 'general',
+        occupancyYear: '2026',
+        floorArea: '75',
+        incomeAmount: '850',
+        confirmBy2027: 'yes',
+        redZone: 'no',
+        incomeTaxCap: '180000',
+        residentTaxCap: '97500'
       };
 
       const resultNodes = {
-        resultSummaryValue: document.getElementById('resultSummaryValue'),
-        inputUnitView: document.getElementById('inputUnitView'),
-        sqmView: document.getElementById('sqmView'),
-        tsuboView: document.getElementById('tsuboView'),
-        joView: document.getElementById('joView'),
-        formulaNote: document.getElementById('formulaNote')
+        statusMessage: document.getElementById('statusMessage'),
+        totalDeductionView: document.getElementById('totalDeductionView'),
+        firstYearDeductionView: document.getElementById('firstYearDeductionView'),
+        loanLimitView: document.getElementById('loanLimitView'),
+        periodView: document.getElementById('periodView'),
+        taxCapView: document.getElementById('taxCapView'),
+        monthlyPaymentView: document.getElementById('monthlyPaymentView'),
+        resultNote: document.getElementById('resultNote')
+      };
+
+      const LOAN_RULES = {
+        new: {
+          longterm: { general: { limit: 4500, period: 13 }, family: { limit: 5000, period: 13 } },
+          zeh: { general: { limit: 3500, period: 13 }, family: { limit: 4500, period: 13 } },
+          standard: {
+            defaultRule: { general: { limit: 2000, period: 13 }, family: { limit: 3000, period: 13 } },
+            futureRule: { general: { limit: 0, period: 0 }, family: { limit: 0, period: 0 } },
+            confirmException: { general: { limit: 2000, period: 10 }, family: { limit: 3000, period: 10 } }
+          },
+          other: { general: { limit: 0, period: 0 }, family: { limit: 0, period: 0 } }
+        },
+        used: {
+          longterm: { general: { limit: 3500, period: 13 }, family: { limit: 4500, period: 13 } },
+          zeh: { general: { limit: 3500, period: 13 }, family: { limit: 4500, period: 13 } },
+          standard: { general: { limit: 2000, period: 13 }, family: { limit: 3000, period: 13 } },
+          other: { general: { limit: 2000, period: 10 }, family: { limit: 2000, period: 10 } }
+        },
+        reform: {
+          longterm: { general: { limit: 2000, period: 10 }, family: { limit: 2000, period: 10 } },
+          zeh: { general: { limit: 2000, period: 10 }, family: { limit: 2000, period: 10 } },
+          standard: { general: { limit: 2000, period: 10 }, family: { limit: 2000, period: 10 } },
+          other: { general: { limit: 2000, period: 10 }, family: { limit: 2000, period: 10 } }
+        }
       };
 
       function parseNumber(value) {
@@ -484,31 +764,20 @@
         return Number.isFinite(parsed) ? parsed : NaN;
       }
 
-      function formatSqm(value) {
-        return Number(value || 0).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '㎡';
+      function toYenFromMan(valueMan) {
+        return Math.round(Number(valueMan || 0) * 10000);
       }
 
-      function formatTsubo(value) {
-        return Number(value || 0).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '坪';
+      function formatYen(value) {
+        return Math.round(value || 0).toLocaleString('ja-JP') + '円';
       }
 
-      function formatJo(value) {
-        return Number(value || 0).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '畳';
+      function formatManYen(valueMan) {
+        return Number(valueMan || 0).toLocaleString('ja-JP') + '万円';
       }
 
-      function updateInputHint() {
-        if (inputUnit.value === 'sqm') {
-          inputValueHint.textContent = '㎡で入力';
-          inputValue.placeholder = '例）72.50';
-          return;
-        }
-        if (inputUnit.value === 'tsubo') {
-          inputValueHint.textContent = '坪で入力';
-          inputValue.placeholder = '例）21.93';
-          return;
-        }
-        inputValueHint.textContent = '畳で入力';
-        inputValue.placeholder = '例）44.75';
+      function clearSchedule() {
+        scheduleBody.innerHTML = '<tr><td colspan="4">計算するとここに表示されます。</td></tr>';
       }
 
       function validateField(input) {
@@ -522,8 +791,15 @@
           const numericValue = parseNumber(value);
           if (Number.isNaN(numericValue)) {
             message = '数値で入力してください。';
-          } else if (numericValue <= 0) {
-            message = '0より大きい数値で入力してください。';
+          } else if (numericValue < 0) {
+            message = '0以上の数値で入力してください。';
+          }
+        }
+
+        if (input.id === 'repaymentYears') {
+          const years = parseNumber(value);
+          if (!Number.isNaN(years) && years <= 0) {
+            message = '1年以上で入力してください。';
           }
         }
 
@@ -556,66 +832,199 @@
         return isValid;
       }
 
-      function calculateValues() {
-        const unit = form.inputUnit.value;
-        const value = parseNumber(form.inputValue.value);
-        let sqm = 0;
+      function updatePerformanceState() {
+        const isReform = acquisitionType.value === 'reform';
+        if (isReform) {
+          performanceType.value = 'other';
+          performanceType.disabled = true;
+          return;
+        }
+        performanceType.disabled = false;
+      }
 
-        if (unit === 'sqm') {
-          sqm = value;
-        } else if (unit === 'tsubo') {
-          sqm = value * TSUBO_TO_SQM;
-        } else {
-          sqm = value * JO_TO_SQM;
+      function determineLoanRule(params) {
+        const occupancyYear = Number(params.occupancyYear);
+
+        if (params.acquisitionType === 'reform') {
+          return { limit: 2000, period: 10, reason: 'リフォームは 2,000万円 × 10年 の簡易ルールで計算しています。' };
+        }
+
+        if (params.acquisitionType === 'new' && occupancyYear >= 2028 && params.redZone === 'yes') {
+          return { limit: 0, period: 0, reason: '2028年以降入居分の災害レッドゾーン内の新築住宅は対象外です。' };
+        }
+
+        const homeRules = LOAN_RULES[params.acquisitionType][params.performanceType];
+
+        if (params.acquisitionType === 'new' && params.performanceType === 'standard') {
+          if (occupancyYear <= 2027) {
+            const rule = homeRules.defaultRule[params.householdType];
+            return { limit: rule.limit, period: rule.period, reason: '2026〜2027年入居の新築・省エネ基準適合住宅として計算しています。' };
+          }
+
+          if (params.confirmBy2027 === 'yes') {
+            const rule = homeRules.confirmException[params.householdType];
+            return { limit: rule.limit, period: rule.period, reason: '2028年以降入居ですが、2027年末までに建築確認を受けた例外として計算しています。' };
+          }
+
+          return { limit: 0, period: 0, reason: '2028年以降入居の新築・省エネ基準適合住宅は原則対象外です。' };
+        }
+
+        const rule = homeRules[params.householdType];
+        if (!rule || !rule.limit) {
+          return { limit: 0, period: 0, reason: 'この条件は対象外として計算しています。' };
+        }
+        return { limit: rule.limit, period: rule.period, reason: '選択した区分に対応する借入限度額テーブルで計算しています。' };
+      }
+
+      function determineEligibility(params, loanRule) {
+        const issues = [];
+        const upliftUsed = params.householdType === 'family' && loanRule.limit > 0;
+        const minFloorArea = (params.incomeAmount > 1000 || upliftUsed) ? 50 : 40;
+
+        if (params.incomeAmount > 2000) {
+          issues.push('合計所得金額が2,000万円を超えるため、このサンプルでは対象外です。');
+        }
+        if (params.floorArea < minFloorArea) {
+          issues.push('床面積要件を満たしていません。今回の条件では ' + minFloorArea + '㎡ 以上が必要です。');
+        }
+        if (loanRule.limit <= 0 || loanRule.period <= 0) {
+          issues.push(loanRule.reason);
         }
 
         return {
-          unit: unit,
-          inputValue: value,
-          sqm: sqm,
-          tsubo: sqm / TSUBO_TO_SQM,
-          jo: sqm / JO_TO_SQM
+          isEligible: issues.length === 0,
+          issues: issues,
+          minFloorArea: minFloorArea
         };
       }
 
-      function renderResult(values) {
-        const unitTextMap = {
-          sqm: '平米（㎡）',
-          tsubo: '坪',
-          jo: '畳'
+      function calculateMonthlyPayment(principal, annualRate, years) {
+        const months = years * 12;
+        if (months <= 0) return 0;
+        const monthlyRate = annualRate / 12;
+        if (monthlyRate === 0) {
+          return principal / months;
+        }
+        return principal * monthlyRate / (1 - Math.pow(1 + monthlyRate, -months));
+      }
+
+      function buildAmortizationSchedule(principal, annualRatePercent, years, deductionPeriodYears, loanLimitYen, annualTaxCap) {
+        const annualRate = annualRatePercent / 100;
+        const monthlyRate = annualRate / 12;
+        const months = years * 12;
+        const monthlyPayment = calculateMonthlyPayment(principal, annualRate, years);
+        let balance = principal;
+        const schedule = [];
+
+        for (let year = 1; year <= deductionPeriodYears; year += 1) {
+          for (let month = 1; month <= 12; month += 1) {
+            if (balance <= 0) break;
+            const interest = monthlyRate === 0 ? 0 : balance * monthlyRate;
+            const principalPart = monthlyPayment - interest;
+            balance = Math.max(0, balance - principalPart);
+          }
+
+          const yearEndBalance = balance;
+          const baseDeduction = Math.min(yearEndBalance, loanLimitYen) * 0.007;
+          const actualDeduction = Math.min(baseDeduction, annualTaxCap);
+          schedule.push({
+            year: year,
+            yearEndBalance: yearEndBalance,
+            baseDeduction: baseDeduction,
+            actualDeduction: actualDeduction
+          });
+
+          if (balance <= 0) {
+            break;
+          }
+        }
+
+        return {
+          monthlyPayment: monthlyPayment,
+          schedule: schedule
         };
+      }
 
-        let inputText = '';
-        if (values.unit === 'sqm') {
-          inputText = formatSqm(values.inputValue);
-        } else if (values.unit === 'tsubo') {
-          inputText = formatTsubo(values.inputValue);
-        } else {
-          inputText = formatJo(values.inputValue);
-        }
-
-        resultNodes.resultSummaryValue.textContent = inputText;
-        resultNodes.inputUnitView.textContent = unitTextMap[values.unit];
-        resultNodes.sqmView.textContent = formatSqm(values.sqm);
-        resultNodes.tsuboView.textContent = formatTsubo(values.tsubo);
-        resultNodes.joView.textContent = formatJo(values.jo);
-
-        if (values.unit === 'sqm') {
-          resultNodes.formulaNote.textContent = '入力値を平米として扱い、坪数 = 平米数 ÷ 3.30579、畳数 = 平米数 ÷ 1.62 で換算しています。';
+      function renderSchedule(rows) {
+        if (!rows.length) {
+          clearSchedule();
           return;
         }
-        if (values.unit === 'tsubo') {
-          resultNodes.formulaNote.textContent = '入力値を坪として扱い、平米数 = 坪数 × 3.30579、畳数 = 平米数 ÷ 1.62 で換算しています。';
-          return;
-        }
-        resultNodes.formulaNote.textContent = '入力値を畳として扱い、平米数 = 畳数 × 1.62、坪数 = 平米数 ÷ 3.30579 で換算しています。';
+
+        scheduleBody.innerHTML = rows.map(function (row) {
+          return '<tr>' +
+            '<td>' + row.year + '年目</td>' +
+            '<td>' + formatYen(row.yearEndBalance) + '</td>' +
+            '<td>' + formatYen(row.baseDeduction) + '</td>' +
+            '<td>' + formatYen(row.actualDeduction) + '</td>' +
+          '</tr>';
+        }).join('');
       }
 
       function calculateAndRender() {
         if (!validateForm()) {
+          clearSchedule();
           return;
         }
-        renderResult(calculateValues());
+
+        const params = {
+          loanAmount: parseNumber(form.loanAmount.value),
+          interestRate: parseNumber(form.interestRate.value),
+          repaymentYears: parseNumber(form.repaymentYears.value),
+          acquisitionType: form.acquisitionType.value,
+          performanceType: form.performanceType.value,
+          householdType: form.householdType.value,
+          occupancyYear: form.occupancyYear.value,
+          floorArea: parseNumber(form.floorArea.value),
+          incomeAmount: parseNumber(form.incomeAmount.value),
+          confirmBy2027: form.confirmBy2027.value,
+          redZone: form.redZone.value,
+          incomeTaxCap: parseNumber(form.incomeTaxCap.value),
+          residentTaxCap: parseNumber(form.residentTaxCap.value)
+        };
+
+        const loanRule = determineLoanRule(params);
+        const eligibility = determineEligibility(params, loanRule);
+        const annualTaxCap = params.incomeTaxCap + params.residentTaxCap;
+
+        resultNodes.loanLimitView.textContent = loanRule.limit > 0 ? formatManYen(loanRule.limit) : '対象外';
+        resultNodes.periodView.textContent = loanRule.period > 0 ? Math.min(loanRule.period, params.repaymentYears) + '年' : '対象外';
+        resultNodes.taxCapView.textContent = formatYen(annualTaxCap);
+
+        if (!eligibility.isEligible) {
+          resultNodes.statusMessage.textContent = eligibility.issues.join(' / ');
+          resultNodes.statusMessage.classList.add('is-error');
+          resultNodes.totalDeductionView.textContent = '0円';
+          resultNodes.firstYearDeductionView.textContent = '0円';
+          resultNodes.monthlyPaymentView.textContent = '-';
+          resultNodes.resultNote.textContent = '入力条件を見直すと、再計算できます。';
+          clearSchedule();
+          return;
+        }
+
+        const principalYen = toYenFromMan(params.loanAmount);
+        const deductionPeriodYears = Math.min(loanRule.period, params.repaymentYears);
+        const amortization = buildAmortizationSchedule(
+          principalYen,
+          params.interestRate,
+          params.repaymentYears,
+          deductionPeriodYears,
+          toYenFromMan(loanRule.limit),
+          annualTaxCap
+        );
+
+        const totalDeduction = amortization.schedule.reduce(function (sum, row) {
+          return sum + row.actualDeduction;
+        }, 0);
+        const firstYear = amortization.schedule[0] || { actualDeduction: 0 };
+
+        resultNodes.statusMessage.textContent = '適用対象として概算しました。' + loanRule.reason;
+        resultNodes.statusMessage.classList.remove('is-error');
+        resultNodes.totalDeductionView.textContent = formatYen(totalDeduction);
+        resultNodes.firstYearDeductionView.textContent = formatYen(firstYear.actualDeduction);
+        resultNodes.monthlyPaymentView.textContent = formatYen(amortization.monthlyPayment);
+        resultNodes.resultNote.textContent = '所得要件は2,000万円以下、床面積要件は ' + eligibility.minFloorArea + '㎡ 以上として判定しています。';
+        renderSchedule(amortization.schedule);
       }
 
       form.addEventListener('submit', function (event) {
@@ -626,15 +1035,18 @@
       form.querySelectorAll('input, select').forEach(function (field) {
         field.addEventListener('input', function () {
           validateField(field);
+          if (field === acquisitionType) {
+            updatePerformanceState();
+          }
           if (validateForm()) {
             calculateAndRender();
           }
         });
         field.addEventListener('change', function () {
-          if (field === inputUnit) {
-            updateInputHint();
-          }
           validateField(field);
+          if (field === acquisitionType) {
+            updatePerformanceState();
+          }
           if (validateForm()) {
             calculateAndRender();
           }
@@ -656,11 +1068,11 @@
           }
         });
 
-        updateInputHint();
+        updatePerformanceState();
         calculateAndRender();
       });
 
-      updateInputHint();
+      updatePerformanceState();
       calculateAndRender();
     }());
   </script>
