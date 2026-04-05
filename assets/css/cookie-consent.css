@@ -1,0 +1,59 @@
+/* Cookie Consent (minimal) */
+.c-cookie {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  display: none; /* JSで必要なときだけ表示 */
+}
+
+.c-cookie__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  gap: 12px;
+}
+
+.c-cookie__text {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.c-cookie__link {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.c-cookie__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.c-cookie__btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.c-cookie__btn--accept {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.c-cookie__btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}

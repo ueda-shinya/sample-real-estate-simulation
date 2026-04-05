@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>坪単価・平米単価・坪数 計算ツール サンプル</title>
+  <style>
+    :root {
+      --color-bg: #f6f8fc;
+      --color-surface: #ffffff;
+      --color-surface-sub: #f8fbff;
+      --color-border: #d8e1ee;
+      --color-text: #1f2937;
+      --color-text-sub: #5b6472;
+      --color-primary: #7c3aed;
+      --color-primary-dark: #6d28d9;
+      --color-accent: #f5f3ff;
+      --color-danger: #b91c1c;
+      --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      color: var(--color-text);
+      background: linear-gradient(180deg, #f3efff 0%, var(--color-bg) 220px, var(--color-bg) 100%);
+      line-height: 1.7;
+    }
+
+    button, input, select { font: inherit; }
+
+    .l-page {
+      width: min(1120px, calc(100% - 32px));
+      margin-inline: auto;
+      padding: 32px 0 64px;
+    }
+
+    .c-hero {
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #f7f3ff 100%);
+      border: 1px solid rgba(124, 58, 237, 0.12);
+      border-radius: 28px;
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+    }
+
+    .c-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--color-accent);
+      color: var(--color-primary-dark);
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .c-hero__title {
+      margin: 16px 0 12px;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1.3;
+    }
+
+    .c-hero__lead {
+      margin: 0;
+      color: var(--color-text-sub);
+    }
+
+    .c-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 0.95fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .c-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .c-panel {
+      padding: 28px;
+    }
+
+    .c-panel__title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      line-height: 1.4;
+    }
+
+    .c-panel__lead {
+      margin: 0 0 24px;
+      color: var(--color-text-sub);
+      font-size: 0.95rem;
+    }
+
+    .c-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .c-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .c-field__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .c-field__label {
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .c-field__hint {
+      color: var(--color-text-sub);
+      font-size: 0.82rem;
+    }
+
+    .c-form__row {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .c-input,
+    .c-select {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid #c8d4e3;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--color-text);
+      transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+    }
+
+    .c-input:focus,
+    .c-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.14);
+    }
+
+    .c-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 6px;
+    }
+
+    .c-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      min-height: 52px;
+      padding: 0 24px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .15s ease, background-color .2s ease;
+    }
+
+    .c-button:hover { transform: translateY(-1px); }
+
+    .c-button--primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .c-button--primary:hover { background: var(--color-primary-dark); }
+
+    .c-button--secondary {
+      background: #efe9ff;
+      color: var(--color-primary-dark);
+    }
+
+    .c-resultCard {
+      position: sticky;
+      top: 24px;
+      padding: 28px;
+    }
+
+    .c-summary {
+      margin-bottom: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #f6f2ff 0%, #fcfbff 100%);
+      border: 1px solid #e3d7ff;
+    }
+
+    .c-summary__label {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+
+    .c-summary__value {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
+    .c-breakdown {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .c-breakdown__item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      background: var(--color-surface-sub);
+    }
+
+    .c-breakdown__term {
+      margin: 0;
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .c-breakdown__desc {
+      margin: 2px 0 0;
+      color: var(--color-text-sub);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .c-breakdown__value {
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .c-note {
+      margin: 0;
+      color: var(--color-text-sub);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .c-tableWrap {
+      overflow-x: auto;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+    }
+
+    .c-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    .c-table th,
+    .c-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--color-border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.92rem;
+    }
+
+    .c-table th {
+      background: #faf7ff;
+      font-weight: 700;
+    }
+
+    .c-table tr:last-child td { border-bottom: none; }
+
+    .u-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    .is-invalid {
+      border-color: var(--color-danger);
+      background: #fff8f8;
+    }
+
+    .c-error {
+      margin: 4px 0 0;
+      font-size: 0.83rem;
+      color: var(--color-danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 920px) {
+      .c-grid { grid-template-columns: 1fr; }
+      .c-resultCard { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      .l-page { width: min(100% - 20px, 1120px); padding-top: 20px; }
+      .c-hero, .c-panel, .c-resultCard { padding: 20px; }
+      .c-form__row { grid-template-columns: 1fr; }
+      .c-actions { flex-direction: column; }
+      .c-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="l-page">
+    <section class="c-hero" aria-labelledby="hero-title">
+      <span class="c-hero__badge">SAMPLE PAGE</span>
+      <h1 class="c-hero__title" id="hero-title">坪単価・平米単価・坪数 計算ツール</h1>
+      <p class="c-hero__lead">
+        価格と面積を入力し、面積の単位を「平米」または「坪」から選ぶだけで、平米数・坪数・平米単価・坪単価をまとめて確認できるサンプルです。入力の考え方がシンプルなので、提案用ページとしてもわかりやすい構成にしています。
+      </p>
+    </section>
+
+    <div class="c-grid">
+      <section class="c-card c-panel" aria-labelledby="form-title">
+        <h2 class="c-panel__title" id="form-title">条件を入力してください</h2>
+        <p class="c-panel__lead">
+          物件価格と面積を入力し、面積の単位を選択してください。入力した単位をもとに、自動で平米数と坪数を換算し、平米単価と坪単価を計算します。
+        </p>
+
+        <form class="c-form" id="tsuboCalculatorForm" novalidate>
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="salePrice">物件価格</label>
+              <span class="c-field__hint">万円で入力</span>
+            </div>
+            <input class="c-input js-required js-number" id="salePrice" name="salePrice" type="number" inputmode="decimal" min="0" step="1" value="3500" aria-describedby="salePriceError">
+            <p class="c-error u-hidden" id="salePriceError"></p>
+          </div>
+
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="areaUnit">面積の単位</label>
+              <span class="c-field__hint">入力しやすい単位を選択</span>
+            </div>
+            <select class="c-select js-required" id="areaUnit" name="areaUnit" aria-describedby="areaUnitError">
+              <option value="sqm">平米（㎡）</option>
+              <option value="tsubo">坪</option>
+            </select>
+            <p class="c-error u-hidden" id="areaUnitError"></p>
+          </div>
+
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="areaValue">面積</label>
+              <span class="c-field__hint" id="areaUnitHint">㎡で入力</span>
+            </div>
+            <input class="c-input js-required js-number" id="areaValue" name="areaValue" type="number" inputmode="decimal" min="0" step="0.01" value="72.50" aria-describedby="areaValueError">
+            <p class="c-error u-hidden" id="areaValueError"></p>
+          </div>
+
+          <div class="c-actions">
+            <button class="c-button c-button--primary" type="submit">計算する</button>
+            <button class="c-button c-button--secondary" type="button" id="resetButton">初期値に戻す</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="c-card c-resultCard" aria-labelledby="result-title">
+        <h2 class="c-panel__title" id="result-title">計算結果</h2>
+        <p class="c-panel__lead">入力した単位をもとに換算して表示します。</p>
+
+        <div class="c-summary" aria-live="polite" aria-atomic="true">
+          <p class="c-summary__label">入力した面積の換算結果</p>
+          <p class="c-summary__value" id="resultSummaryValue">-</p>
+        </div>
+
+        <div class="c-breakdown">
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">物件価格</p>
+              <p class="c-breakdown__desc">万円入力を円換算して使います。</p>
+            </div>
+            <div class="c-breakdown__value" id="salePriceView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">入力単位</p>
+              <p class="c-breakdown__desc">選択した面積の単位です。</p>
+            </div>
+            <div class="c-breakdown__value" id="inputUnitView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">平米数</p>
+              <p class="c-breakdown__desc">計算に使用した㎡換算値です。</p>
+            </div>
+            <div class="c-breakdown__value" id="areaSqmView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">坪数</p>
+              <p class="c-breakdown__desc">1坪 = 3.30579㎡で換算しています。</p>
+            </div>
+            <div class="c-breakdown__value" id="tsuboView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">平米単価</p>
+              <p class="c-breakdown__desc">物件価格 ÷ 平米数です。</p>
+            </div>
+            <div class="c-breakdown__value" id="heibeiPriceView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">坪単価</p>
+              <p class="c-breakdown__desc">物件価格 ÷ 坪数です。</p>
+            </div>
+            <div class="c-breakdown__value" id="tsuboPriceView">-</div>
+          </div>
+        </div>
+
+        <p class="c-note" id="formulaNote">1坪 = 3.30579㎡として換算しています。</p>
+      </aside>
+    </div>
+
+    <section class="c-card c-panel" aria-labelledby="guide-title" style="margin-top:24px;">
+      <h2 class="c-panel__title" id="guide-title">計算の考え方</h2>
+      <p class="c-panel__lead">
+        面積は平米でも坪でも入力でき、内部では相互換算したうえで、平米単価と坪単価を同時に出します。入力の自由度を上げつつ、結果は一覧で見えるようにした構成です。
+      </p>
+      <div class="c-tableWrap">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>計算式</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>坪 → 平米</td>
+              <td>坪数 × 3.30579</td>
+            </tr>
+            <tr>
+              <td>平米 → 坪</td>
+              <td>平米数 ÷ 3.30579</td>
+            </tr>
+            <tr>
+              <td>平米単価</td>
+              <td>物件価格（円） ÷ 平米数</td>
+            </tr>
+            <tr>
+              <td>坪単価</td>
+              <td>物件価格（円） ÷ 坪数</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const TSUBO_TO_SQM = 3.30579;
+      const form = document.getElementById('tsuboCalculatorForm');
+      const resetButton = document.getElementById('resetButton');
+      const areaUnit = document.getElementById('areaUnit');
+      const areaValue = document.getElementById('areaValue');
+      const areaUnitHint = document.getElementById('areaUnitHint');
+
+      const defaultValues = {
+        salePrice: '3500',
+        areaUnit: 'sqm',
+        areaValue: '72.50'
+      };
+
+      const resultNodes = {
+        resultSummaryValue: document.getElementById('resultSummaryValue'),
+        salePriceView: document.getElementById('salePriceView'),
+        inputUnitView: document.getElementById('inputUnitView'),
+        areaSqmView: document.getElementById('areaSqmView'),
+        tsuboView: document.getElementById('tsuboView'),
+        heibeiPriceView: document.getElementById('heibeiPriceView'),
+        tsuboPriceView: document.getElementById('tsuboPriceView'),
+        formulaNote: document.getElementById('formulaNote')
+      };
+
+      function parseNumber(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : NaN;
+      }
+
+      function toYenFromMan(valueMan) {
+        return Math.round(Number(valueMan || 0) * 10000);
+      }
+
+      function formatYen(value) {
+        return Math.round(value || 0).toLocaleString('ja-JP') + '円';
+      }
+
+      function formatSqm(value) {
+        return Number(value || 0).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '㎡';
+      }
+
+      function formatTsubo(value) {
+        return Number(value || 0).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '坪';
+      }
+
+      function updateAreaHint() {
+        if (areaUnit.value === 'sqm') {
+          areaUnitHint.textContent = '㎡で入力';
+          areaValue.placeholder = '例）72.50';
+          return;
+        }
+        areaUnitHint.textContent = '坪で入力';
+        areaValue.placeholder = '例）21.93';
+      }
+
+      function validateField(input) {
+        const errorNode = document.getElementById(input.id + 'Error');
+        let message = '';
+        const value = input.value.trim();
+
+        if (input.classList.contains('js-required') && value === '') {
+          message = 'この項目は必須です。';
+        } else if (input.classList.contains('js-number')) {
+          const numericValue = parseNumber(value);
+          if (Number.isNaN(numericValue)) {
+            message = '数値で入力してください。';
+          } else if (numericValue <= 0) {
+            message = '0より大きい数値で入力してください。';
+          }
+        }
+
+        if (message) {
+          input.classList.add('is-invalid');
+          input.removeAttribute('aria-invalid');
+          input.setAttribute('aria-invalid', 'true');
+          if (errorNode) {
+            errorNode.textContent = message;
+            errorNode.classList.remove('u-hidden');
+          }
+          return false;
+        }
+
+        input.classList.remove('is-invalid');
+        input.removeAttribute('aria-invalid');
+        if (errorNode) {
+          errorNode.textContent = '';
+          errorNode.classList.add('u-hidden');
+        }
+        return true;
+      }
+
+      function validateForm() {
+        let isValid = true;
+        form.querySelectorAll('.js-required').forEach(function (input) {
+          if (!validateField(input)) {
+            isValid = false;
+          }
+        });
+        return isValid;
+      }
+
+      function calculateValues() {
+        const salePriceMan = parseNumber(form.salePrice.value);
+        const areaInput = parseNumber(form.areaValue.value);
+        const inputUnit = form.areaUnit.value;
+        const salePriceYen = toYenFromMan(salePriceMan);
+
+        let areaSqm = 0;
+        let tsubo = 0;
+
+        if (inputUnit === 'sqm') {
+          areaSqm = areaInput;
+          tsubo = areaSqm / TSUBO_TO_SQM;
+        } else {
+          tsubo = areaInput;
+          areaSqm = tsubo * TSUBO_TO_SQM;
+        }
+
+        const heibeiPrice = salePriceYen / areaSqm;
+        const tsuboPrice = salePriceYen / tsubo;
+
+        return {
+          salePriceYen: salePriceYen,
+          inputUnit: inputUnit,
+          areaSqm: areaSqm,
+          tsubo: tsubo,
+          heibeiPrice: heibeiPrice,
+          tsuboPrice: tsuboPrice,
+          inputArea: areaInput
+        };
+      }
+
+      function renderResult(values) {
+        const inputUnitText = values.inputUnit === 'sqm' ? '平米（㎡）' : '坪';
+        const inputAreaText = values.inputUnit === 'sqm'
+          ? Number(values.inputArea).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '㎡'
+          : Number(values.inputArea).toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '坪';
+
+        resultNodes.resultSummaryValue.textContent = inputAreaText;
+        resultNodes.salePriceView.textContent = formatYen(values.salePriceYen);
+        resultNodes.inputUnitView.textContent = inputUnitText;
+        resultNodes.areaSqmView.textContent = formatSqm(values.areaSqm);
+        resultNodes.tsuboView.textContent = formatTsubo(values.tsubo);
+        resultNodes.heibeiPriceView.textContent = formatYen(values.heibeiPrice);
+        resultNodes.tsuboPriceView.textContent = formatYen(values.tsuboPrice);
+        resultNodes.formulaNote.textContent = values.inputUnit === 'sqm'
+          ? '入力値を平米として扱い、坪数 = 平米数 ÷ 3.30579 で換算しています。'
+          : '入力値を坪として扱い、平米数 = 坪数 × 3.30579 で換算しています。';
+      }
+
+      function calculateAndRender() {
+        if (!validateForm()) {
+          return;
+        }
+        renderResult(calculateValues());
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        calculateAndRender();
+      });
+
+      form.querySelectorAll('input, select').forEach(function (field) {
+        field.addEventListener('input', function () {
+          validateField(field);
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+        field.addEventListener('change', function () {
+          if (field === areaUnit) {
+            updateAreaHint();
+          }
+          validateField(field);
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+      });
+
+      resetButton.addEventListener('click', function () {
+        Object.keys(defaultValues).forEach(function (key) {
+          form.elements[key].value = defaultValues[key];
+        });
+
+        form.querySelectorAll('.js-required').forEach(function (input) {
+          input.classList.remove('is-invalid');
+          input.removeAttribute('aria-invalid');
+          const errorNode = document.getElementById(input.id + 'Error');
+          if (errorNode) {
+            errorNode.textContent = '';
+            errorNode.classList.add('u-hidden');
+          }
+        });
+
+        updateAreaHint();
+        calculateAndRender();
+      });
+
+      updateAreaHint();
+      calculateAndRender();
+    }());
+  </script>
+</body>
+</html>

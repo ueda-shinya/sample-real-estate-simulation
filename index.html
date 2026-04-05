@@ -1,0 +1,414 @@
+<!doctype html>
+
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>不動産シミュレーター一覧</title>
+  <style>
+    :root {
+      --color-bg: #f6f8fc;
+      --color-surface: #ffffff;
+      --color-surface-sub: #f8fbff;
+      --color-border: #d8e1ee;
+      --color-text: #1f2937;
+      --color-text-sub: #5b6472;
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-accent: #eff6ff;
+      --color-accent-strong: #dbeafe;
+      --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+```
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  color: var(--color-text);
+  background: linear-gradient(180deg, #edf4ff 0%, var(--color-bg) 220px, var(--color-bg) 100%);
+  line-height: 1.7;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.l-page {
+  width: min(1180px, calc(100% - 32px));
+  margin-inline: auto;
+  padding: 32px 0 64px;
+}
+
+.c-hero {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  border-radius: 28px;
+  box-shadow: var(--shadow-card);
+  padding: 32px;
+}
+
+.c-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.c-hero__title {
+  margin: 16px 0 12px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.3;
+}
+
+.c-hero__lead {
+  margin: 0;
+  color: var(--color-text-sub);
+  font-size: 1rem;
+}
+
+.c-section + .c-section {
+  margin-top: 24px;
+}
+
+.c-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+}
+
+.c-section__title {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.c-section__lead {
+  margin: 0 0 24px;
+  color: var(--color-text-sub);
+  font-size: 0.96rem;
+}
+
+.c-toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.c-toolCard {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.c-toolCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1);
+  border-color: #bfd2f6;
+}
+
+.c-toolCard__meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.c-toolCard__title {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.c-toolCard__text {
+  margin: 0;
+  color: var(--color-text-sub);
+  font-size: 0.93rem;
+}
+
+.c-toolCard__list {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--color-text-sub);
+  font-size: 0.9rem;
+}
+
+.c-toolCard__list li + li {
+  margin-top: 6px;
+}
+
+.c-toolCard__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  transition: background-color 0.18s ease;
+}
+
+.c-toolCard__link:hover {
+  background: var(--color-primary-dark);
+}
+
+.c-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.c-point {
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface-sub);
+}
+
+.c-point__title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.c-point__text {
+  margin: 0;
+  color: var(--color-text-sub);
+  font-size: 0.92rem;
+}
+
+.c-list {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--color-text-sub);
+}
+
+.c-list li + li {
+  margin-top: 8px;
+}
+
+.c-cta {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+  padding: 28px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  border: 1px solid #cfe0ff;
+}
+
+.c-cta__title {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.4;
+}
+
+.c-cta__text {
+  margin: 0;
+  color: var(--color-text-sub);
+}
+
+.c-cta__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 50px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  transition: background-color 0.18s ease;
+}
+
+.c-cta__button:hover {
+  background: var(--color-primary-dark);
+}
+
+@media (max-width: 900px) {
+  .c-toolsGrid,
+  .c-points {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .l-page {
+    width: min(100% - 20px, 1180px);
+    padding-top: 20px;
+  }
+
+  .c-hero,
+  .c-card,
+  .c-cta {
+    padding: 20px;
+  }
+}
+```
+
+  </style>
+</head>
+<body>
+  <main class="l-page">
+    <section class="c-hero" aria-labelledby="page-title">
+      <span class="c-hero__badge">TOOLS INDEX</span>
+      <h1 class="c-hero__title" id="page-title">不動産シミュレーター一覧</h1>
+      <p class="c-hero__lead">
+        不動産の売却・購入・税金・費用まで、まとめて確認できるシミュレーター一覧ページです。まずは概算を把握して、そのあと必要に応じて個別相談へ進める導線を想定しています。
+      </p>
+    </section>
+
+```
+<section class="c-section c-card" aria-labelledby="tools-title">
+  <h2 class="c-section__title" id="tools-title">シミュレーター一覧</h2>
+  <p class="c-section__lead">
+    気になる項目から選んでください。売却、購入、税金、単価計算まで、よく使うテーマをまとめています。
+  </p>
+
+  <div class="c-toolsGrid">
+    <article class="c-toolCard">
+      <span class="c-toolCard__meta">01</span>
+      <h3 class="c-toolCard__title">不動産売却シミュレーター</h3>
+      <p class="c-toolCard__text">売却時の手取り額を概算したい方向けのツールです。</p>
+      <ul class="c-toolCard__list">
+        <li>売却価格、ローン残債、購入時条件を入力</li>
+        <li>手取り額、仲介手数料、税金などを概算</li>
+      </ul>
+      <a class="c-toolCard__link" href="/tools/real-estate-sale-simulator/">ツールを見る</a>
+    </article>
+
+    <article class="c-toolCard">
+      <span class="c-toolCard__meta">02</span>
+      <h3 class="c-toolCard__title">仲介手数料シミュレーター</h3>
+      <p class="c-toolCard__text">売却価格から仲介手数料の目安を確認したい方向けです。</p>
+      <ul class="c-toolCard__list">
+        <li>3% + 6万円などの上限ルールに対応</li>
+        <li>税込概算までその場で確認可能</li>
+      </ul>
+      <a class="c-toolCard__link" href="/tools/brokerage-fee-calculator/">ツールを見る</a>
+    </article>
+
+    <article class="c-toolCard">
+      <span class="c-toolCard__meta">03</span>
+      <h3 class="c-toolCard__title">坪単価・平米単価 計算ツール</h3>
+      <p class="c-toolCard__text">価格と面積から、単価感をすぐに把握したい方向けです。</p>
+      <ul class="c-toolCard__list">
+        <li>面積は平米でも坪でも入力可能</li>
+        <li>坪単価、平米単価、面積換算をまとめて表示</li>
+      </ul>
+      <a class="c-toolCard__link" href="/tools/tsubo-unit-price-calculator/">ツールを見る</a>
+    </article>
+
+    <article class="c-toolCard">
+      <span class="c-toolCard__meta">04</span>
+      <h3 class="c-toolCard__title">坪・平米・畳 変換ツール</h3>
+      <p class="c-toolCard__text">不動産資料の面積表記をすぐに読み替えたい時に便利です。</p>
+      <ul class="c-toolCard__list">
+        <li>坪、㎡、畳の相互変換に対応</li>
+        <li>入力単位を選ぶだけのシンプル設計</li>
+      </ul>
+      <a class="c-toolCard__link" href="/tools/area-unit-converter/">ツールを見る</a>
+    </article>
+
+    <article class="c-toolCard">
+      <span class="c-toolCard__meta">05</span>
+      <h3 class="c-toolCard__title">住宅ローン控除シミュレーター</h3>
+      <p class="c-toolCard__text">住宅ローン控除の概算と期間別の控除額を確認したい方向けです。</p>
+      <ul class="c-toolCard__list">
+        <li>借入額、金利、返済年数から年末残高を試算</li>
+        <li>制度条件を踏まえて控除額を概算</li>
+      </ul>
+      <a class="c-toolCard__link" href="/tools/housing-loan-deduction-simulator/">ツールを見る</a>
+    </article>
+
+    <article class="c-toolCard">
+      <span class="c-toolCard__meta">06</span>
+      <h3 class="c-toolCard__title">不動産取得税 計算ツール</h3>
+      <p class="c-toolCard__text">建物や土地の取得時にかかる税額の目安を確認したい方向けです。</p>
+      <ul class="c-toolCard__list">
+        <li>固定資産税評価額ベースで入力</li>
+        <li>建物軽減と土地減額を分けて試算</li>
+      </ul>
+      <a class="c-toolCard__link" href="/tools/acquisition-tax-calculator/">ツールを見る</a>
+    </article>
+  </div>
+</section>
+
+<section class="c-section c-card" aria-labelledby="recommend-title">
+  <h2 class="c-section__title" id="recommend-title">こんな方におすすめ</h2>
+  <p class="c-section__lead">数字の全体感をつかんでから、次の行動を決めたい方に向いています。</p>
+  <div class="c-points">
+    <div class="c-point">
+      <h3 class="c-point__title">売却するか迷っている方</h3>
+      <p class="c-point__text">手取り額や仲介手数料の目安を先に確認することで、判断しやすくなります。</p>
+    </div>
+    <div class="c-point">
+      <h3 class="c-point__title">購入時の税金や費用を知りたい方</h3>
+      <p class="c-point__text">取得税や住宅ローン控除を事前に把握すると、資金計画が立てやすくなります。</p>
+    </div>
+    <div class="c-point">
+      <h3 class="c-point__title">不動産資料の見方を整理したい方</h3>
+      <p class="c-point__text">坪・㎡・畳、坪単価・平米単価など、数字の読み替えに役立ちます。</p>
+    </div>
+    <div class="c-point">
+      <h3 class="c-point__title">まずは概算だけ知りたい方</h3>
+      <p class="c-point__text">細かな条件確認の前に、おおまかな金額感をつかみたい時に使いやすい構成です。</p>
+    </div>
+  </div>
+</section>
+
+<section class="c-section c-card" aria-labelledby="notice-title">
+  <h2 class="c-section__title" id="notice-title">ご利用時の注意</h2>
+  <ul class="c-list">
+    <li>各ツールは概算シミュレーションです。</li>
+    <li>実際の金額は、物件条件、制度改正、自治体、税務判断、個別事情などで変わります。</li>
+    <li>正確な金額や適用可否は、専門家または各自治体・税務署・金融機関などにご確認ください。</li>
+  </ul>
+</section>
+
+<section class="c-section c-cta" aria-labelledby="cta-title">
+  <h2 class="c-cta__title" id="cta-title">自分の場合で詳しく確認したい方へ</h2>
+  <p class="c-cta__text">
+    シミュレーターで概算を確認したあと、条件が複雑なケースや個別の相談が必要な場合は、お問い合わせページからご相談ください。
+  </p>
+  <a class="c-cta__button" href="/contact/">無料相談はこちら</a>
+</section>
+```
+
+  </main>
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>不動産売却シミュレーター サンプル</title>
+  <style>
+    :root {
+      --color-bg: #f5f7fb;
+      --color-surface: #ffffff;
+      --color-surface-sub: #f8fafc;
+      --color-border: #d8e1ee;
+      --color-text: #1f2937;
+      --color-text-sub: #5b6472;
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-accent: #eff6ff;
+      --color-danger: #b91c1c;
+      --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      color: var(--color-text);
+      background: linear-gradient(180deg, #eef4ff 0%, var(--color-bg) 240px, var(--color-bg) 100%);
+      line-height: 1.7;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .l-page {
+      width: min(1120px, calc(100% - 32px));
+      margin-inline: auto;
+      padding: 32px 0 64px;
+    }
+
+    .c-hero {
+      padding: 20px 0 28px;
+    }
+
+    .c-hero__inner {
+      background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
+      border: 1px solid rgba(37, 99, 235, 0.12);
+      border-radius: 28px;
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+    }
+
+    .c-hero__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--color-accent);
+      color: var(--color-primary-dark);
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .c-hero__title {
+      margin: 16px 0 12px;
+      font-size: clamp(1.75rem, 3vw, 2.6rem);
+      line-height: 1.3;
+    }
+
+    .c-hero__lead {
+      margin: 0;
+      color: var(--color-text-sub);
+      font-size: 1rem;
+    }
+
+    .c-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .c-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .c-formCard {
+      padding: 28px;
+    }
+
+    .c-formCard__title,
+    .c-resultCard__title,
+    .c-noteCard__title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      line-height: 1.4;
+    }
+
+    .c-formCard__lead,
+    .c-noteCard__lead {
+      margin: 0 0 24px;
+      color: var(--color-text-sub);
+      font-size: 0.95rem;
+    }
+
+    .c-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .c-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .c-field__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .c-field__label {
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .c-field__hint {
+      color: var(--color-text-sub);
+      font-size: 0.82rem;
+    }
+
+    .c-input,
+    .c-select {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid #c8d4e3;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--color-text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .c-input:focus,
+    .c-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    }
+
+    .c-form__row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .c-buttonGroup {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 6px;
+    }
+
+    .c-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      min-height: 52px;
+      padding: 0 24px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.2s ease, background-color 0.2s ease;
+    }
+
+    .c-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .c-button:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.2);
+      outline-offset: 2px;
+    }
+
+    .c-button--primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .c-button--primary:hover {
+      background: var(--color-primary-dark);
+    }
+
+    .c-button--secondary {
+      background: #e5edf9;
+      color: #1e3a8a;
+    }
+
+    .c-resultCard {
+      position: sticky;
+      top: 24px;
+      padding: 28px;
+    }
+
+    .c-resultCard__lead {
+      margin: 0 0 20px;
+      color: var(--color-text-sub);
+      font-size: 0.95rem;
+    }
+
+    .c-resultSummary {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #eef5ff 0%, #f9fbff 100%);
+      border: 1px solid #d6e5ff;
+      margin-bottom: 18px;
+    }
+
+    .c-resultSummary__label {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+
+    .c-resultSummary__value {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .c-breakdown {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .c-breakdown__item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      background: var(--color-surface-sub);
+    }
+
+    .c-breakdown__term {
+      margin: 0;
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .c-breakdown__desc {
+      margin: 2px 0 0;
+      color: var(--color-text-sub);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .c-breakdown__value {
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .c-note {
+      margin: 0;
+      color: var(--color-text-sub);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .c-noteCard {
+      margin-top: 24px;
+      padding: 24px 28px;
+    }
+
+    .c-list {
+      margin: 0;
+      padding-left: 1.2em;
+      color: var(--color-text-sub);
+      font-size: 0.94rem;
+    }
+
+    .c-list li + li {
+      margin-top: 8px;
+    }
+
+    .u-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    .is-invalid {
+      border-color: var(--color-danger);
+      background: #fff8f8;
+    }
+
+    .c-error {
+      margin: 4px 0 0;
+      font-size: 0.83rem;
+      color: var(--color-danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .c-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .c-resultCard {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .l-page {
+        width: min(100% - 20px, 1120px);
+        padding-top: 20px;
+      }
+
+      .c-hero__inner,
+      .c-formCard,
+      .c-resultCard,
+      .c-noteCard {
+        padding: 20px;
+      }
+
+      .c-form__row {
+        grid-template-columns: 1fr;
+      }
+
+      .c-buttonGroup {
+        flex-direction: column;
+      }
+
+      .c-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="l-page">
+    <section class="c-hero" aria-labelledby="hero-title">
+      <div class="c-hero__inner">
+        <span class="c-hero__eyebrow">SAMPLE PAGE</span>
+        <h1 class="c-hero__title" id="hero-title">不動産売却シミュレーター</h1>
+        <p class="c-hero__lead">
+          売却価格・住宅ローン残債・購入時の条件を入力すると、概算の手取り額をその場で確認できるサンプルページです。実務利用前に、デザイン・導線・入力項目のたたき台として確認できます。
+        </p>
+      </div>
+    </section>
+
+    <div class="c-grid">
+      <section class="c-card c-formCard" aria-labelledby="simulator-title">
+        <h2 class="c-formCard__title" id="simulator-title">条件を入力してください</h2>
+        <p class="c-formCard__lead">
+          このサンプルでは、税額や諸費用は簡易ロジックで概算しています。住宅ローン残高や取得費を変えると、右側の結果が自動で変わります。
+        </p>
+
+        <form class="c-form" id="saleSimulatorForm" novalidate>
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="salePrice">希望売却価格</label>
+              <span class="c-field__hint">万円で入力</span>
+            </div>
+            <input class="c-input js-required js-number" id="salePrice" name="salePrice" type="number" inputmode="decimal" min="0" step="1" value="3500" aria-describedby="salePriceError">
+            <p class="c-error u-hidden" id="salePriceError"></p>
+          </div>
+
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="loanBalance">住宅ローン残債</label>
+              <span class="c-field__hint">万円で入力</span>
+            </div>
+            <input class="c-input js-required js-number" id="loanBalance" name="loanBalance" type="number" inputmode="decimal" min="0" step="1" value="1800" aria-describedby="loanBalanceError">
+            <p class="c-error u-hidden" id="loanBalanceError"></p>
+          </div>
+
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="purchasePrice">購入時物件価格</label>
+              <span class="c-field__hint">万円で入力</span>
+            </div>
+            <input class="c-input js-required js-number" id="purchasePrice" name="purchasePrice" type="number" inputmode="decimal" min="0" step="1" value="2800" aria-describedby="purchasePriceError">
+            <p class="c-error u-hidden" id="purchasePriceError"></p>
+          </div>
+
+          <div class="c-form__row">
+            <div class="c-field">
+              <div class="c-field__head">
+                <label class="c-field__label" for="purchaseYear">購入年</label>
+                <span class="c-field__hint">西暦</span>
+              </div>
+              <input class="c-input js-required js-number" id="purchaseYear" name="purchaseYear" type="number" inputmode="numeric" min="1950" max="2099" step="1" value="2016" aria-describedby="purchaseYearError">
+              <p class="c-error u-hidden" id="purchaseYearError"></p>
+            </div>
+
+            <div class="c-field">
+              <div class="c-field__head">
+                <label class="c-field__label" for="purchaseMonth">購入月</label>
+                <span class="c-field__hint">1〜12</span>
+              </div>
+              <input class="c-input js-required js-number" id="purchaseMonth" name="purchaseMonth" type="number" inputmode="numeric" min="1" max="12" step="1" value="6" aria-describedby="purchaseMonthError">
+              <p class="c-error u-hidden" id="purchaseMonthError"></p>
+            </div>
+          </div>
+
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="propertyType">物件種別</label>
+              <span class="c-field__hint">簡易計算に使用</span>
+            </div>
+            <select class="c-select js-required" id="propertyType" name="propertyType" aria-describedby="propertyTypeError">
+              <option value="condo">マンション</option>
+              <option value="house">戸建て</option>
+              <option value="land">土地</option>
+            </select>
+            <p class="c-error u-hidden" id="propertyTypeError"></p>
+          </div>
+
+          <div class="c-buttonGroup">
+            <button class="c-button c-button--primary" type="submit">手取り額を計算する</button>
+            <button class="c-button c-button--secondary" type="button" id="resetButton">初期値に戻す</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="c-card c-resultCard" aria-labelledby="result-title">
+        <h2 class="c-resultCard__title" id="result-title">シミュレーション結果</h2>
+        <p class="c-resultCard__lead">概算の手取り額と内訳を表示します。</p>
+
+        <div class="c-resultSummary" aria-live="polite" aria-atomic="true">
+          <p class="c-resultSummary__label">概算の手取り額</p>
+          <p class="c-resultSummary__value" id="netProceeds">-</p>
+        </div>
+
+        <div class="c-breakdown" id="breakdownList">
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">売却価格</p>
+              <p class="c-breakdown__desc">入力した希望売却価格です。</p>
+            </div>
+            <div class="c-breakdown__value" id="salePriceView">-</div>
+          </div>
+
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">仲介手数料（税込概算）</p>
+              <p class="c-breakdown__desc">一般的な上限式ベースの簡易計算です。</p>
+            </div>
+            <div class="c-breakdown__value" id="brokerageFeeView">-</div>
+          </div>
+
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">印紙税（概算）</p>
+              <p class="c-breakdown__desc">売買契約書を想定した簡易表示です。</p>
+            </div>
+            <div class="c-breakdown__value" id="stampTaxView">-</div>
+          </div>
+
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">譲渡所得税等（概算）</p>
+              <p class="c-breakdown__desc">所有期間と簡易取得費から概算しています。</p>
+            </div>
+            <div class="c-breakdown__value" id="capitalGainsTaxView">-</div>
+          </div>
+
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">住宅ローン残債</p>
+              <p class="c-breakdown__desc">入力した残債を差し引いています。</p>
+            </div>
+            <div class="c-breakdown__value" id="loanBalanceView">-</div>
+          </div>
+        </div>
+
+        <p class="c-note" id="ownershipNote">所有期間に応じて、短期譲渡 / 長期譲渡の簡易判定を行います。</p>
+      </aside>
+    </div>
+
+    <section class="c-card c-noteCard" aria-labelledby="notice-title">
+      <h2 class="c-noteCard__title" id="notice-title">このサンプルの前提</h2>
+      <p class="c-noteCard__lead">
+        デモ用途のため、入力しやすさを優先した簡易版です。実際の税額・費用は、契約内容・所有形態・居住用特例・取得費の内訳・建物構造・譲渡費用などで変わります。
+      </p>
+      <ul class="c-list">
+        <li>手取り額 = 売却価格 − 仲介手数料 − 印紙税 − 譲渡所得税等 − 住宅ローン残債 の簡易モデルです。</li>
+        <li>マンション・戸建ては建物部分の概算減価を考慮し、土地は減価しない前提です。</li>
+        <li>このページはサンプルです。本番では「概算です」「詳細は税理士・不動産会社へ」などの注意文を明記してください。</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const form = document.getElementById('saleSimulatorForm');
+      const resetButton = document.getElementById('resetButton');
+      const defaultValues = {
+        salePrice: '3500',
+        loanBalance: '1800',
+        purchasePrice: '2800',
+        purchaseYear: '2016',
+        purchaseMonth: '6',
+        propertyType: 'condo'
+      };
+
+      const TAX_RATES = {
+        shortTerm: 0.3963,
+        longTerm: 0.20315
+      };
+
+      const DEPRECIATION_RATES = {
+        condo: 0.015,
+        house: 0.02,
+        land: 0
+      };
+
+      const resultNodes = {
+        netProceeds: document.getElementById('netProceeds'),
+        salePriceView: document.getElementById('salePriceView'),
+        brokerageFeeView: document.getElementById('brokerageFeeView'),
+        stampTaxView: document.getElementById('stampTaxView'),
+        capitalGainsTaxView: document.getElementById('capitalGainsTaxView'),
+        loanBalanceView: document.getElementById('loanBalanceView'),
+        ownershipNote: document.getElementById('ownershipNote')
+      };
+
+      function toYenFromMan(valueMan) {
+        return Math.round(Number(valueMan || 0) * 10000);
+      }
+
+      function formatYen(value) {
+        const rounded = Math.round(value || 0);
+        return rounded.toLocaleString('ja-JP') + '円';
+      }
+
+      function parseNumber(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : NaN;
+      }
+
+      function monthsBetween(year, month, baseDate) {
+        const y = parseInt(year, 10);
+        const m = parseInt(month, 10);
+        if (!Number.isInteger(y) || !Number.isInteger(m)) return 0;
+        const purchaseDate = new Date(y, m - 1, 1);
+        const diffYears = baseDate.getFullYear() - purchaseDate.getFullYear();
+        const diffMonths = baseDate.getMonth() - purchaseDate.getMonth();
+        return Math.max(0, diffYears * 12 + diffMonths);
+      }
+
+      function calculateBrokerageFee(salePriceYen) {
+        if (salePriceYen <= 0) return 0;
+
+        let baseFee = 0;
+        if (salePriceYen <= 2000000) {
+          baseFee = salePriceYen * 0.05;
+        } else if (salePriceYen <= 4000000) {
+          baseFee = salePriceYen * 0.04 + 20000;
+        } else {
+          baseFee = salePriceYen * 0.03 + 60000;
+        }
+        return Math.round(baseFee * 1.1);
+      }
+
+      function calculateStampTax(salePriceYen) {
+        if (salePriceYen <= 0) return 0;
+        if (salePriceYen <= 10000000) return 5000;
+        if (salePriceYen <= 50000000) return 10000;
+        if (salePriceYen <= 100000000) return 30000;
+        return 60000;
+      }
+
+      function calculateAdjustedPurchasePrice(purchasePriceYen, propertyType, ownedMonths) {
+        if (propertyType === 'land') {
+          return purchasePriceYen;
+        }
+
+        const buildingRatio = propertyType === 'condo' ? 0.85 : 0.8;
+        const landRatio = 1 - buildingRatio;
+        const buildingPrice = purchasePriceYen * buildingRatio;
+        const landPrice = purchasePriceYen * landRatio;
+        const annualRate = DEPRECIATION_RATES[propertyType] || 0;
+        const elapsedYears = ownedMonths / 12;
+        const depreciation = buildingPrice * annualRate * elapsedYears;
+        const adjustedBuildingPrice = Math.max(0, buildingPrice - depreciation);
+        return Math.round(landPrice + adjustedBuildingPrice);
+      }
+
+      function calculateCapitalGainsTax(salePriceYen, adjustedPurchasePriceYen, brokerageFeeYen, stampTaxYen, ownedMonths) {
+        const transferCost = brokerageFeeYen + stampTaxYen;
+        const gain = salePriceYen - adjustedPurchasePriceYen - transferCost;
+        if (gain <= 0) {
+          return { tax: 0, gain: gain, type: ownedMonths >= 60 ? 'long' : 'short' };
+        }
+
+        const isLongTerm = ownedMonths >= 60;
+        const rate = isLongTerm ? TAX_RATES.longTerm : TAX_RATES.shortTerm;
+        return {
+          tax: Math.round(gain * rate),
+          gain: gain,
+          type: isLongTerm ? 'long' : 'short'
+        };
+      }
+
+      function validateField(input) {
+        const errorNode = document.getElementById(input.id + 'Error');
+        let message = '';
+        const value = input.value.trim();
+
+        if (input.classList.contains('js-required') && value === '') {
+          message = 'この項目は必須です。';
+        } else if (input.classList.contains('js-number')) {
+          const numericValue = parseNumber(value);
+          if (Number.isNaN(numericValue)) {
+            message = '数値で入力してください。';
+          } else if (input.id === 'purchaseMonth' && (numericValue < 1 || numericValue > 12)) {
+            message = '1〜12の範囲で入力してください。';
+          } else if (input.id === 'purchaseYear' && (numericValue < 1950 || numericValue > 2099)) {
+            message = '1950〜2099の範囲で入力してください。';
+          } else if (numericValue < 0) {
+            message = '0以上の数値で入力してください。';
+          }
+        }
+
+        if (message) {
+          input.classList.add('is-invalid');
+          errorNode.textContent = message;
+          errorNode.classList.remove('u-hidden');
+          input.setAttribute('aria-invalid', 'true');
+          return false;
+        }
+
+        input.classList.remove('is-invalid');
+        errorNode.textContent = '';
+        errorNode.classList.add('u-hidden');
+        input.removeAttribute('aria-invalid');
+        return true;
+      }
+
+      function validateForm() {
+        const inputs = form.querySelectorAll('.js-required');
+        let isValid = true;
+        inputs.forEach(function (input) {
+          if (!validateField(input)) {
+            isValid = false;
+          }
+        });
+        return isValid;
+      }
+
+      function calculateAndRender() {
+        if (!validateForm()) {
+          return;
+        }
+
+        const salePriceMan = parseNumber(form.salePrice.value);
+        const loanBalanceMan = parseNumber(form.loanBalance.value);
+        const purchasePriceMan = parseNumber(form.purchasePrice.value);
+        const purchaseYear = parseNumber(form.purchaseYear.value);
+        const purchaseMonth = parseNumber(form.purchaseMonth.value);
+        const propertyType = form.propertyType.value;
+
+        const salePriceYen = toYenFromMan(salePriceMan);
+        const loanBalanceYen = toYenFromMan(loanBalanceMan);
+        const purchasePriceYen = toYenFromMan(purchasePriceMan);
+        const ownedMonths = monthsBetween(purchaseYear, purchaseMonth, new Date());
+        const adjustedPurchasePriceYen = calculateAdjustedPurchasePrice(purchasePriceYen, propertyType, ownedMonths);
+        const brokerageFeeYen = calculateBrokerageFee(salePriceYen);
+        const stampTaxYen = calculateStampTax(salePriceYen);
+        const taxResult = calculateCapitalGainsTax(
+          salePriceYen,
+          adjustedPurchasePriceYen,
+          brokerageFeeYen,
+          stampTaxYen,
+          ownedMonths
+        );
+
+        const netProceedsYen = salePriceYen - brokerageFeeYen - stampTaxYen - taxResult.tax - loanBalanceYen;
+        const ownershipTypeText = taxResult.type === 'long' ? '長期譲渡（5年以上の簡易判定）' : '短期譲渡（5年未満の簡易判定）';
+        const ownedYears = (ownedMonths / 12).toFixed(1);
+
+        resultNodes.netProceeds.textContent = formatYen(netProceedsYen);
+        resultNodes.salePriceView.textContent = formatYen(salePriceYen);
+        resultNodes.brokerageFeeView.textContent = formatYen(brokerageFeeYen);
+        resultNodes.stampTaxView.textContent = formatYen(stampTaxYen);
+        resultNodes.capitalGainsTaxView.textContent = formatYen(taxResult.tax);
+        resultNodes.loanBalanceView.textContent = formatYen(loanBalanceYen);
+        resultNodes.ownershipNote.textContent = '所有期間は約' + ownedYears + '年として計算しています。' + ownershipTypeText + 'で税率を概算しています。';
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        calculateAndRender();
+      });
+
+      form.querySelectorAll('input, select').forEach(function (field) {
+        field.addEventListener('input', function () {
+          validateField(field);
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+        field.addEventListener('change', function () {
+          validateField(field);
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+      });
+
+      resetButton.addEventListener('click', function () {
+        Object.keys(defaultValues).forEach(function (key) {
+          form.elements[key].value = defaultValues[key];
+        });
+
+        form.querySelectorAll('.js-required').forEach(function (input) {
+          input.classList.remove('is-invalid');
+          input.removeAttribute('aria-invalid');
+          const errorNode = document.getElementById(input.id + 'Error');
+          errorNode.textContent = '';
+          errorNode.classList.add('u-hidden');
+        });
+
+        calculateAndRender();
+      });
+
+      calculateAndRender();
+    }());
+  </script>
+</body>
+</html>

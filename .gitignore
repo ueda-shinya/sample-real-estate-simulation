@@ -1,0 +1,10 @@
+# OSが自動生成するファイル
+.DS_Store
+Thumbs.db
+*.ttf
+*.bck
+.env
+.htaccess
+/fonts
+robots.txt
+*.zip

@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>不動産取得税 計算ツール サンプル</title>
+  <style>
+    :root {
+      --color-bg: #f4fbf8;
+      --color-surface: #ffffff;
+      --color-surface-sub: #f8fcfb;
+      --color-border: #d7e6df;
+      --color-text: #1f2937;
+      --color-text-sub: #5b6472;
+      --color-primary: #0f766e;
+      --color-primary-dark: #115e59;
+      --color-accent: #ecfdf5;
+      --color-danger: #b91c1c;
+      --color-success: #065f46;
+      --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      color: var(--color-text);
+      background: linear-gradient(180deg, #eafaf4 0%, var(--color-bg) 220px, var(--color-bg) 100%);
+      line-height: 1.7;
+    }
+
+    button, input, select { font: inherit; }
+
+    .l-page {
+      width: min(1240px, calc(100% - 32px));
+      margin-inline: auto;
+      padding: 32px 0 64px;
+    }
+
+    .c-hero {
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #eefcf7 100%);
+      border: 1px solid rgba(15, 118, 110, 0.12);
+      border-radius: 28px;
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+    }
+
+    .c-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--color-accent);
+      color: var(--color-primary-dark);
+      font-size: .875rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .c-hero__title {
+      margin: 16px 0 12px;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      line-height: 1.3;
+    }
+
+    .c-hero__lead {
+      margin: 0;
+      color: var(--color-text-sub);
+    }
+
+    .c-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(360px, .96fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .c-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .c-panel { padding: 28px; }
+
+    .c-panel__title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      line-height: 1.4;
+    }
+
+    .c-panel__lead {
+      margin: 0 0 24px;
+      color: var(--color-text-sub);
+      font-size: .95rem;
+    }
+
+    .c-form {
+      display: grid;
+      gap: 24px;
+    }
+
+    .c-fieldset {
+      margin: 0;
+      padding: 20px;
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      display: grid;
+      gap: 18px;
+      background: var(--color-surface-sub);
+    }
+
+    .c-fieldset__title {
+      margin: 0;
+      font-size: 1.04rem;
+      font-weight: 800;
+    }
+
+    .c-fieldset__lead {
+      margin: -8px 0 0;
+      color: var(--color-text-sub);
+      font-size: .88rem;
+    }
+
+    .c-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .c-field__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .c-field__label {
+      font-weight: 700;
+      font-size: .98rem;
+    }
+
+    .c-field__hint {
+      color: var(--color-text-sub);
+      font-size: .82rem;
+    }
+
+    .c-form__row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .c-form__row--triple {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .c-input,
+    .c-select {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid #c8d9d1;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--color-text);
+      transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+    }
+
+    .c-input:focus,
+    .c-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14);
+    }
+
+    .c-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 4px;
+    }
+
+    .c-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      min-height: 52px;
+      padding: 0 24px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .15s ease, background-color .2s ease;
+    }
+
+    .c-button:hover { transform: translateY(-1px); }
+    .c-button--primary { background: var(--color-primary); color: #fff; }
+    .c-button--primary:hover { background: var(--color-primary-dark); }
+    .c-button--secondary { background: #def7ec; color: var(--color-primary-dark); }
+
+    .c-resultCard {
+      position: sticky;
+      top: 24px;
+      padding: 28px;
+    }
+
+    .c-summary {
+      margin-bottom: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ecfdf5 0%, #fbfefd 100%);
+      border: 1px solid #ccefe0;
+    }
+
+    .c-summary__label {
+      margin: 0 0 8px;
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+
+    .c-summary__value {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
+    .c-status {
+      margin: 0 0 18px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: .9rem;
+      font-weight: 700;
+      background: #ecfdf5;
+      color: var(--color-success);
+      border: 1px solid #a7f3d0;
+    }
+
+    .c-status.is-error {
+      background: #fef2f2;
+      color: var(--color-danger);
+      border-color: #fecaca;
+    }
+
+    .c-breakdown {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .c-breakdown__item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      background: var(--color-surface-sub);
+    }
+
+    .c-breakdown__term {
+      margin: 0;
+      font-size: .94rem;
+      font-weight: 700;
+    }
+
+    .c-breakdown__desc {
+      margin: 2px 0 0;
+      color: var(--color-text-sub);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+
+    .c-breakdown__value {
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .c-tableWrap {
+      overflow-x: auto;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+    }
+
+    .c-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    .c-table th,
+    .c-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--color-border);
+      text-align: left;
+      vertical-align: top;
+      font-size: .9rem;
+    }
+
+    .c-table th {
+      background: #f2fbf8;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .c-table td:last-child,
+    .c-table th:last-child { text-align: right; }
+    .c-table tr:last-child td { border-bottom: none; }
+
+    .c-note {
+      margin: 0;
+      color: var(--color-text-sub);
+      font-size: .88rem;
+      line-height: 1.7;
+    }
+
+    .u-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    .is-invalid {
+      border-color: var(--color-danger);
+      background: #fff8f8;
+    }
+
+    .c-error {
+      margin: 4px 0 0;
+      font-size: .83rem;
+      color: var(--color-danger);
+      font-weight: 700;
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 980px) {
+      .c-grid { grid-template-columns: 1fr; }
+      .c-resultCard { position: static; }
+    }
+
+    @media (max-width: 720px) {
+      .l-page { width: min(100% - 20px, 1240px); padding-top: 20px; }
+      .c-hero, .c-panel, .c-resultCard { padding: 20px; }
+      .c-form__row, .c-form__row--triple { grid-template-columns: 1fr; }
+      .c-actions { flex-direction: column; }
+      .c-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="l-page">
+    <section class="c-hero" aria-labelledby="hero-title">
+      <span class="c-hero__badge">SAMPLE PAGE</span>
+      <h1 class="c-hero__title" id="hero-title">不動産取得税 計算ツール</h1>
+      <p class="c-hero__lead">
+        土地と建物の固定資産税評価額をもとに、不動産取得税の概算を出すサンプルです。住宅と土地は、令和9年3月31日までの取得分について税率3%の特例があり、宅地等の土地は課税標準を2分の1にする特例があります。住宅の建物には1,200万円控除、認定長期優良住宅は1,300万円控除があり、住宅用土地には税額減額の特例もあります。今回のサンプルでは、実務でよく使う条件をできるだけ反映しています。</p>
+    </section>
+
+    <div class="c-grid">
+      <section class="c-card c-panel" aria-labelledby="form-title">
+        <h2 class="c-panel__title" id="form-title">条件を入力してください</h2>
+        <p class="c-panel__lead">
+          このサンプルは、住宅取得に関する不動産取得税を想定しています。建物と土地を別々に計算し、最後に合算します。評価額は売買価格ではなく、固定資産税評価額ベースで入力してください。
+        </p>
+
+        <form class="c-form" id="acquisitionTaxForm" novalidate>
+          <fieldset class="c-fieldset">
+            <legend class="c-fieldset__title">1. 取得条件</legend>
+            <p class="c-fieldset__lead">取得日と住宅区分で税率や床面積要件が変わります。</p>
+
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="acquisitionDate">取得日</label>
+                  <span class="c-field__hint">軽減特例判定に使用</span>
+                </div>
+                <input class="c-input js-required" id="acquisitionDate" name="acquisitionDate" type="date" value="2026-06-15" aria-describedby="acquisitionDateError">
+                <p class="c-error u-hidden" id="acquisitionDateError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="propertyScenario">取得パターン</label>
+                  <span class="c-field__hint">建物軽減・土地減額に使用</span>
+                </div>
+                <select class="c-select js-required" id="propertyScenario" name="propertyScenario" aria-describedby="propertyScenarioError">
+                  <option value="new">新築住宅・新築未使用住宅</option>
+                  <option value="used">中古住宅</option>
+                  <option value="nonresidential">住宅以外</option>
+                </select>
+                <p class="c-error u-hidden" id="propertyScenarioError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="includeLand">土地も取得する</label>
+                  <span class="c-field__hint">土地税額も試算</span>
+                </div>
+                <select class="c-select js-required" id="includeLand" name="includeLand" aria-describedby="includeLandError">
+                  <option value="yes">はい</option>
+                  <option value="no">いいえ</option>
+                </select>
+                <p class="c-error u-hidden" id="includeLandError"></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="c-fieldset">
+            <legend class="c-fieldset__title">2. 建物の条件</legend>
+            <p class="c-fieldset__lead">住宅の軽減措置は床面積と住宅区分で判定します。中古住宅は居住用・耐震要件も確認します。</p>
+
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="buildingValue">建物の固定資産税評価額</label>
+                  <span class="c-field__hint">万円で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="buildingValue" name="buildingValue" type="number" inputmode="decimal" min="0" step="1" value="1800" aria-describedby="buildingValueError">
+                <p class="c-error u-hidden" id="buildingValueError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="floorArea">床面積</label>
+                  <span class="c-field__hint">㎡で入力</span>
+                </div>
+                <input class="c-input js-required js-number" id="floorArea" name="floorArea" type="number" inputmode="decimal" min="0" step="0.1" value="78" aria-describedby="floorAreaError">
+                <p class="c-error u-hidden" id="floorAreaError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="buildingUse">建物用途</label>
+                  <span class="c-field__hint">中古住宅要件に使用</span>
+                </div>
+                <select class="c-select js-required" id="buildingUse" name="buildingUse" aria-describedby="buildingUseError">
+                  <option value="self">自己居住用</option>
+                  <option value="rental">賃貸用・自己居住以外</option>
+                </select>
+                <p class="c-error u-hidden" id="buildingUseError"></p>
+              </div>
+            </div>
+
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="isLongLife">認定長期優良住宅</label>
+                  <span class="c-field__hint">新築時の控除増額</span>
+                </div>
+                <select class="c-select js-required" id="isLongLife" name="isLongLife" aria-describedby="isLongLifeError">
+                  <option value="no">いいえ</option>
+                  <option value="yes">はい</option>
+                </select>
+                <p class="c-error u-hidden" id="isLongLifeError"></p>
+              </div>
+
+              <div class="c-field" id="usedBuildYearWrap">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="buildYear">中古住宅の新築年</label>
+                  <span class="c-field__hint">西暦</span>
+                </div>
+                <input class="c-input js-number" id="buildYear" name="buildYear" type="number" inputmode="numeric" min="1900" step="1" value="2005" aria-describedby="buildYearError">
+                <p class="c-error u-hidden" id="buildYearError"></p>
+              </div>
+
+              <div class="c-field" id="usedSeismicWrap">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="seismicEligible">中古住宅の耐震要件</label>
+                  <span class="c-field__hint">昭和56年以前なら重要</span>
+                </div>
+                <select class="c-select" id="seismicEligible" name="seismicEligible" aria-describedby="seismicEligibleError">
+                  <option value="yes">満たす</option>
+                  <option value="no">満たさない</option>
+                </select>
+                <p class="c-error u-hidden" id="seismicEligibleError"></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="c-fieldset" id="landFieldset">
+            <legend class="c-fieldset__title">3. 土地の条件</legend>
+            <p class="c-fieldset__lead">住宅用土地の減額は、45,000円と計算額の大きい方が控除額になります。土地1㎡あたり価格は、課税標準（宅地等は1/2後）÷面積で求めています。</p>
+
+            <div class="c-form__row c-form__row--triple">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="landValue">土地の固定資産税評価額</label>
+                  <span class="c-field__hint">万円で入力</span>
+                </div>
+                <input class="c-input js-number" id="landValue" name="landValue" type="number" inputmode="decimal" min="0" step="1" value="1600" aria-describedby="landValueError">
+                <p class="c-error u-hidden" id="landValueError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="landArea">土地面積</label>
+                  <span class="c-field__hint">㎡で入力</span>
+                </div>
+                <input class="c-input js-number" id="landArea" name="landArea" type="number" inputmode="decimal" min="0" step="0.1" value="140" aria-describedby="landAreaError">
+                <p class="c-error u-hidden" id="landAreaError"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="landType">土地の評価区分</label>
+                  <span class="c-field__hint">宅地等なら1/2特例</span>
+                </div>
+                <select class="c-select js-required" id="landType" name="landType" aria-describedby="landTypeError">
+                  <option value="residential">宅地・宅地比準土地</option>
+                  <option value="other">宅地等以外</option>
+                </select>
+                <p class="c-error u-hidden" id="landTypeError"></p>
+              </div>
+            </div>
+
+            <div class="c-form__row">
+              <div class="c-field">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="landHousingRelation">土地と住宅の関係</label>
+                  <span class="c-field__hint">減額特例の期間要件</span>
+                </div>
+                <select class="c-select js-required" id="landHousingRelation" name="landHousingRelation" aria-describedby="landHousingRelationError">
+                  <option value="same_time">土地と住宅を前後1年で取得</option>
+                  <option value="land_then_house">土地取得後に住宅を新築</option>
+                  <option value="not_applicable">土地の住宅減額は使わない</option>
+                </select>
+                <p class="c-error u-hidden" id="landHousingRelationError"></p>
+              </div>
+
+              <div class="c-field" id="landAfterYearsWrap">
+                <div class="c-field__head">
+                  <label class="c-field__label" for="yearsUntilHouse">土地取得から住宅取得・新築までの年数</label>
+                  <span class="c-field__hint">年で入力</span>
+                </div>
+                <input class="c-input js-number" id="yearsUntilHouse" name="yearsUntilHouse" type="number" inputmode="decimal" min="0" step="0.1" value="1" aria-describedby="yearsUntilHouseError">
+                <p class="c-error u-hidden" id="yearsUntilHouseError"></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="c-actions">
+            <button class="c-button c-button--primary" type="submit">税額を計算する</button>
+            <button class="c-button c-button--secondary" type="button" id="resetButton">初期値に戻す</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="c-card c-resultCard" aria-labelledby="result-title">
+        <h2 class="c-panel__title" id="result-title">計算結果</h2>
+        <p class="c-panel__lead">建物・土地を分けて計算し、合計税額を表示します。</p>
+
+        <p class="c-status" id="statusMessage">条件を判定中です。</p>
+
+        <div class="c-summary" aria-live="polite" aria-atomic="true">
+          <p class="c-summary__label">不動産取得税の概算合計</p>
+          <p class="c-summary__value" id="totalTaxView">-</p>
+        </div>
+
+        <div class="c-breakdown">
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">建物の税額</p>
+              <p class="c-breakdown__desc">建物評価額と控除額から計算</p>
+            </div>
+            <div class="c-breakdown__value" id="buildingTaxView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">土地の税額</p>
+              <p class="c-breakdown__desc">土地の税額から住宅用土地減額を反映</p>
+            </div>
+            <div class="c-breakdown__value" id="landTaxView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">建物の控除額</p>
+              <p class="c-breakdown__desc">新築1,200万円 / 長期優良1,300万円 / 中古は新築年次表ベース</p>
+            </div>
+            <div class="c-breakdown__value" id="buildingDeductionView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">土地の減額額</p>
+              <p class="c-breakdown__desc">45,000円と計算額の大きい方</p>
+            </div>
+            <div class="c-breakdown__value" id="landDeductionView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">適用税率</p>
+              <p class="c-breakdown__desc">住宅・土地は原則3%、住宅以外家屋は4%</p>
+            </div>
+            <div class="c-breakdown__value" id="rateView">-</div>
+          </div>
+        </div>
+
+        <p class="c-note" id="resultNote">このサンプルは概算です。都道府県税事務所の判定や個別事情で変わることがあります。</p>
+      </aside>
+    </div>
+
+    <section class="c-card c-panel" aria-labelledby="detail-title" style="margin-top:24px;">
+      <h2 class="c-panel__title" id="detail-title">内訳</h2>
+      <div class="c-tableWrap">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>計算内容</th>
+              <th>金額</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody">
+            <tr><td colspan="3">計算するとここに表示されます。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="c-card c-panel" aria-labelledby="guide-title" style="margin-top:24px;">
+      <h2 class="c-panel__title" id="guide-title">このサンプルで反映している主な考え方</h2>
+      <div class="c-tableWrap">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>反映内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>税率</td>
+              <td>土地と住宅用家屋は令和9年3月31日まで3%、住宅以外の家屋は4%</td>
+            </tr>
+            <tr>
+              <td>土地の課税標準</td>
+              <td>宅地・宅地比準土地は令和9年3月31日まで評価額の1/2</td>
+            </tr>
+            <tr>
+              <td>新築住宅の建物控除</td>
+              <td>1,200万円、認定長期優良住宅は1,300万円</td>
+            </tr>
+            <tr>
+              <td>中古住宅の建物控除</td>
+              <td>新築年月日に応じた控除額テーブルを簡易反映</td>
+            </tr>
+            <tr>
+              <td>床面積要件</td>
+              <td>2026年3月31日以前は50〜240㎡、2026年4月1日以降は40〜240㎡を基本反映</td>
+            </tr>
+            <tr>
+              <td>住宅用土地の減額</td>
+              <td>45,000円 または 土地1㎡単価 × 床面積×2（上限200㎡）× 3% の大きい方</td>
+            </tr>
+            <tr>
+              <td>土地の期間要件</td>
+              <td>土地取得後の住宅新築は原則2年以内、令和13年3月31日まで取得なら3年以内を反映</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="c-note" style="margin-top:14px;">本番版でさらに厳密にするなら、共同住宅の貸家判定、買取再販、中古取得後耐震改修、都道府県ごとの申請要件、免税点や非課税事由まで分けて実装するとより実務寄りになります。</p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const form = document.getElementById('acquisitionTaxForm');
+      const resetButton = document.getElementById('resetButton');
+      const detailBody = document.getElementById('detailBody');
+      const propertyScenario = document.getElementById('propertyScenario');
+      const includeLand = document.getElementById('includeLand');
+      const landFieldset = document.getElementById('landFieldset');
+      const usedBuildYearWrap = document.getElementById('usedBuildYearWrap');
+      const usedSeismicWrap = document.getElementById('usedSeismicWrap');
+      const landAfterYearsWrap = document.getElementById('landAfterYearsWrap');
+
+      const resultNodes = {
+        statusMessage: document.getElementById('statusMessage'),
+        totalTaxView: document.getElementById('totalTaxView'),
+        buildingTaxView: document.getElementById('buildingTaxView'),
+        landTaxView: document.getElementById('landTaxView'),
+        buildingDeductionView: document.getElementById('buildingDeductionView'),
+        landDeductionView: document.getElementById('landDeductionView'),
+        rateView: document.getElementById('rateView'),
+        resultNote: document.getElementById('resultNote')
+      };
+
+      const defaultValues = {
+        acquisitionDate: '2026-06-15',
+        propertyScenario: 'new',
+        includeLand: 'yes',
+        buildingValue: '1800',
+        floorArea: '78',
+        buildingUse: 'self',
+        isLongLife: 'no',
+        buildYear: '2005',
+        seismicEligible: 'yes',
+        landValue: '1600',
+        landArea: '140',
+        landType: 'residential',
+        landHousingRelation: 'same_time',
+        yearsUntilHouse: '1'
+      };
+
+      const usedDeductionTable = [
+        { start: '1982-01-01', end: '1985-06-30', amountMan: 420 },
+        { start: '1985-07-01', end: '1989-03-31', amountMan: 450 },
+        { start: '1989-04-01', end: '1997-03-31', amountMan: 1000 },
+        { start: '1997-04-01', end: '2014-03-31', amountMan: 1200 },
+        { start: '2014-04-01', end: '9999-12-31', amountMan: 1200 }
+      ];
+
+      function parseNumber(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : NaN;
+      }
+
+      function toYenFromMan(valueMan) {
+        return Math.round(Number(valueMan || 0) * 10000);
+      }
+
+      function formatYen(value) {
+        return Math.round(value || 0).toLocaleString('ja-JP') + '円';
+      }
+
+      function formatManYen(valueMan) {
+        return Number(valueMan || 0).toLocaleString('ja-JP') + '万円';
+      }
+
+      function isOnOrBefore(dateText, compareText) {
+        return new Date(dateText) <= new Date(compareText);
+      }
+
+      function validateField(input) {
+        const errorNode = document.getElementById(input.id + 'Error');
+        let message = '';
+        const value = String(input.value || '').trim();
+
+        if (input.closest('[hidden]')) {
+          input.classList.remove('is-invalid');
+          input.removeAttribute('aria-invalid');
+          if (errorNode) {
+            errorNode.textContent = '';
+            errorNode.classList.add('u-hidden');
+          }
+          return true;
+        }
+
+        if (input.classList.contains('js-required') && value === '') {
+          message = 'この項目は必須です。';
+        } else if (input.classList.contains('js-number')) {
+          const numericValue = parseNumber(value);
+          if (Number.isNaN(numericValue)) {
+            message = '数値で入力してください。';
+          } else if (numericValue < 0) {
+            message = '0以上の数値で入力してください。';
+          }
+        }
+
+        if (input.id === 'acquisitionDate' && value === '') {
+          message = '取得日を入力してください。';
+        }
+
+        if (message) {
+          input.classList.add('is-invalid');
+          input.setAttribute('aria-invalid', 'true');
+          if (errorNode) {
+            errorNode.textContent = message;
+            errorNode.classList.remove('u-hidden');
+          }
+          return false;
+        }
+
+        input.classList.remove('is-invalid');
+        input.removeAttribute('aria-invalid');
+        if (errorNode) {
+          errorNode.textContent = '';
+          errorNode.classList.add('u-hidden');
+        }
+        return true;
+      }
+
+      function validateForm() {
+        let isValid = true;
+        form.querySelectorAll('.js-required, .js-number').forEach(function (input) {
+          if (!validateField(input)) {
+            isValid = false;
+          }
+        });
+        return isValid;
+      }
+
+      function updateConditionalUI() {
+        const scenario = propertyScenario.value;
+        const landIncluded = includeLand.value === 'yes';
+        const relation = form.landHousingRelation.value;
+
+        usedBuildYearWrap.hidden = scenario !== 'used';
+        usedSeismicWrap.hidden = scenario !== 'used';
+        landFieldset.hidden = !landIncluded;
+        landAfterYearsWrap.hidden = !landIncluded || relation === 'same_time' || relation === 'not_applicable';
+      }
+
+      function getBuildingRate(acquisitionDate, scenario) {
+        if (scenario === 'nonresidential') {
+          return 0.04;
+        }
+        return isOnOrBefore(acquisitionDate, '2027-03-31') ? 0.03 : 0.04;
+      }
+
+      function getLandRate(acquisitionDate) {
+        return isOnOrBefore(acquisitionDate, '2027-03-31') ? 0.03 : 0.04;
+      }
+
+      function getMinFloorArea(acquisitionDate) {
+        return isOnOrBefore(acquisitionDate, '2026-03-31') ? 50 : 40;
+      }
+
+      function getUsedHouseDeductionMan(buildYear) {
+        const dateText = String(buildYear) + '-01-01';
+        for (let i = 0; i < usedDeductionTable.length; i += 1) {
+          const row = usedDeductionTable[i];
+          if (new Date(dateText) >= new Date(row.start) && new Date(dateText) <= new Date(row.end)) {
+            return row.amountMan;
+          }
+        }
+        return 0;
+      }
+
+      function evaluateBuilding(params) {
+        const rate = getBuildingRate(params.acquisitionDate, params.propertyScenario);
+        const valueYen = toYenFromMan(params.buildingValue);
+        const minFloorArea = getMinFloorArea(params.acquisitionDate);
+        const qualifiesFloor = params.floorArea >= minFloorArea && params.floorArea <= 240;
+
+        let deductionYen = 0;
+        let eligible = false;
+        let reason = '住宅軽減の対象外です。';
+
+        if (params.propertyScenario === 'nonresidential') {
+          eligible = false;
+          reason = '住宅以外の家屋として計算しています。';
+        } else if (!qualifiesFloor) {
+          eligible = false;
+          reason = '床面積要件を満たしていません。';
+        } else if (params.propertyScenario === 'new') {
+          eligible = true;
+          deductionYen = toYenFromMan(params.isLongLife === 'yes' ? 1300 : 1200);
+          reason = params.isLongLife === 'yes' ? '認定長期優良住宅として 1,300万円控除を適用しました。' : '新築住宅として 1,200万円控除を適用しました。';
+        } else if (params.propertyScenario === 'used') {
+          const buildYearEligible = Number(params.buildYear) >= 1982 || params.seismicEligible === 'yes';
+          const selfUseEligible = params.buildingUse === 'self';
+          if (buildYearEligible && selfUseEligible) {
+            eligible = true;
+            deductionYen = toYenFromMan(getUsedHouseDeductionMan(params.buildYear));
+            reason = '中古住宅の要件を満たす前提で、建築時期に応じた控除額を適用しました。';
+          } else {
+            reason = !selfUseEligible ? '中古住宅の軽減は自己居住用を前提にしています。' : '中古住宅の耐震要件を満たしていません。';
+          }
+        }
+
+        const taxableBase = Math.max(0, valueYen - deductionYen);
+        const tax = Math.round(taxableBase * rate);
+
+        return {
+          rate: rate,
+          valueYen: valueYen,
+          deductionYen: deductionYen,
+          taxableBase: taxableBase,
+          tax: tax,
+          eligible: eligible,
+          reason: reason,
+          minFloorArea: minFloorArea,
+          qualifiesFloor: qualifiesFloor
+        };
+      }
+
+      function evaluateLand(params, buildingResult) {
+        if (!params.includeLand) {
+          return {
+            rate: 0,
+            originalValueYen: 0,
+            taxableBaseBeforeDeduction: 0,
+            deductionYen: 0,
+            taxBeforeDeduction: 0,
+            tax: 0,
+            eligible: false,
+            reason: '土地は計算対象外です。'
+          };
+        }
+
+        const rate = getLandRate(params.acquisitionDate);
+        const originalValueYen = toYenFromMan(params.landValue);
+        const taxableBase = params.landType === 'residential' && isOnOrBefore(params.acquisitionDate, '2027-03-31')
+          ? Math.round(originalValueYen / 2)
+          : originalValueYen;
+        const taxBeforeDeduction = Math.round(taxableBase * rate);
+
+        let eligible = false;
+        let reason = '住宅用土地の減額特例は使っていません。';
+        let deductionYen = 0;
+
+        const periodLimit = isOnOrBefore(params.acquisitionDate, '2031-03-31') ? 3 : 2;
+        const withinPeriod = params.landHousingRelation === 'same_time'
+          || (params.landHousingRelation === 'land_then_house' && params.yearsUntilHouse <= periodLimit);
+
+        if (params.propertyScenario !== 'nonresidential' && buildingResult.eligible && withinPeriod && params.landHousingRelation !== 'not_applicable') {
+          eligible = true;
+          const areaForDeduction = Math.min(params.floorArea * 2, 200);
+          const landUnitPrice = params.landArea > 0 ? taxableBase / params.landArea : 0;
+          const optionA = 45000;
+          const optionB = Math.round(landUnitPrice * areaForDeduction * rate);
+          deductionYen = Math.max(optionA, optionB);
+          reason = '住宅用土地の減額特例を適用しました。';
+        } else if (!buildingResult.eligible) {
+          reason = '建物が住宅軽減要件を満たしていないため、土地の減額も適用していません。';
+        } else if (!withinPeriod) {
+          reason = '土地と住宅の期間要件を満たしていません。';
+        }
+
+        return {
+          rate: rate,
+          originalValueYen: originalValueYen,
+          taxableBaseBeforeDeduction: taxableBase,
+          deductionYen: deductionYen,
+          taxBeforeDeduction: taxBeforeDeduction,
+          tax: Math.max(0, taxBeforeDeduction - deductionYen),
+          eligible: eligible,
+          reason: reason
+        };
+      }
+
+      function renderDetails(rows) {
+        detailBody.innerHTML = rows.map(function (row) {
+          return '<tr><td>' + row.label + '</td><td>' + row.detail + '</td><td>' + row.value + '</td></tr>';
+        }).join('');
+      }
+
+      function calculateAndRender() {
+        if (!validateForm()) {
+          return;
+        }
+
+        const params = {
+          acquisitionDate: form.acquisitionDate.value,
+          propertyScenario: form.propertyScenario.value,
+          includeLand: form.includeLand.value === 'yes',
+          buildingValue: parseNumber(form.buildingValue.value),
+          floorArea: parseNumber(form.floorArea.value),
+          buildingUse: form.buildingUse.value,
+          isLongLife: form.isLongLife.value,
+          buildYear: parseNumber(form.buildYear.value),
+          seismicEligible: form.seismicEligible.value,
+          landValue: parseNumber(form.landValue.value),
+          landArea: parseNumber(form.landArea.value),
+          landType: form.landType.value,
+          landHousingRelation: form.landHousingRelation.value,
+          yearsUntilHouse: parseNumber(form.yearsUntilHouse.value)
+        };
+
+        const building = evaluateBuilding(params);
+        const land = evaluateLand(params, building);
+        const totalTax = building.tax + land.tax;
+
+        resultNodes.totalTaxView.textContent = formatYen(totalTax);
+        resultNodes.buildingTaxView.textContent = formatYen(building.tax);
+        resultNodes.landTaxView.textContent = formatYen(land.tax);
+        resultNodes.buildingDeductionView.textContent = formatYen(building.deductionYen);
+        resultNodes.landDeductionView.textContent = formatYen(land.deductionYen);
+        resultNodes.rateView.textContent = '建物 ' + Math.round(building.rate * 100) + '% / 土地 ' + Math.round(land.rate * 100) + '%';
+
+        const statusMessages = [];
+        statusMessages.push(building.reason);
+        if (params.includeLand) {
+          statusMessages.push(land.reason);
+        }
+
+        if (building.tax === 0 && (!params.includeLand || land.tax === 0)) {
+          resultNodes.statusMessage.textContent = '今回の条件では、概算上の不動産取得税は 0円 です。' + statusMessages.join(' ');
+          resultNodes.statusMessage.classList.remove('is-error');
+        } else if (!building.qualifiesFloor && params.propertyScenario !== 'nonresidential') {
+          resultNodes.statusMessage.textContent = '床面積要件を満たしていないため、住宅軽減を適用していません。';
+          resultNodes.statusMessage.classList.add('is-error');
+        } else {
+          resultNodes.statusMessage.textContent = statusMessages.join(' ');
+          resultNodes.statusMessage.classList.remove('is-error');
+        }
+
+        resultNodes.resultNote.textContent = '建物の床面積要件は ' + building.minFloorArea + '㎡ 以上 240㎡ 以下として判定しています。売買価格ではなく固定資産税評価額で入力してください。';
+
+        const rows = [
+          { label: '建物評価額', detail: '入力した固定資産税評価額', value: formatYen(building.valueYen) },
+          { label: '建物控除額', detail: building.reason, value: formatYen(building.deductionYen) },
+          { label: '建物課税標準', detail: '建物評価額 - 控除額', value: formatYen(building.taxableBase) },
+          { label: '建物税額', detail: '建物課税標準 × ' + Math.round(building.rate * 100) + '%', value: formatYen(building.tax) }
+        ];
+
+        if (params.includeLand) {
+          rows.push(
+            { label: '土地評価額', detail: '入力した固定資産税評価額', value: formatYen(land.originalValueYen) },
+            { label: '土地課税標準', detail: params.landType === 'residential' && isOnOrBefore(params.acquisitionDate, '2027-03-31') ? '宅地等のため 1/2 特例を反映' : '1/2 特例なし', value: formatYen(land.taxableBaseBeforeDeduction) },
+            { label: '土地の税額（減額前）', detail: '土地課税標準 × ' + Math.round(land.rate * 100) + '%', value: formatYen(land.taxBeforeDeduction) },
+            { label: '土地の減額額', detail: land.reason, value: formatYen(land.deductionYen) },
+            { label: '土地税額', detail: '減額後の税額', value: formatYen(land.tax) }
+          );
+        }
+
+        rows.push({ label: '合計税額', detail: '建物 + 土地', value: formatYen(totalTax) });
+        renderDetails(rows);
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        calculateAndRender();
+      });
+
+      form.querySelectorAll('input, select').forEach(function (field) {
+        field.addEventListener('input', function () {
+          validateField(field);
+          updateConditionalUI();
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+        field.addEventListener('change', function () {
+          validateField(field);
+          updateConditionalUI();
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+      });
+
+      resetButton.addEventListener('click', function () {
+        Object.keys(defaultValues).forEach(function (key) {
+          form.elements[key].value = defaultValues[key];
+        });
+
+        form.querySelectorAll('input, select').forEach(function (input) {
+          input.classList.remove('is-invalid');
+          input.removeAttribute('aria-invalid');
+          const errorNode = document.getElementById(input.id + 'Error');
+          if (errorNode) {
+            errorNode.textContent = '';
+            errorNode.classList.add('u-hidden');
+          }
+        });
+
+        updateConditionalUI();
+        calculateAndRender();
+      });
+
+      updateConditionalUI();
+      calculateAndRender();
+    }());
+  </script>
+</body>
+</html>

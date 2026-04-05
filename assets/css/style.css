@@ -1,0 +1,102 @@
+@charset "UTF-8";
+
+/* リーリース時には消すこと!!! */
+* {
+  /* outline: 1px rgba(255, 0, 0, 0.8) solid; */
+}
+/* 変数の定義 */
+:root {
+  --page-max: 1440px; /* ページ外枠の最大幅（背景/大きなグリッド） */
+  --container-max: 1200px; /* 本文コンテンツの最大幅（可読幅） */
+  --min-page: 375px; /* サイトの最小想定幅（レイアウト崩れ防止） */
+  --gutter: clamp(16px, 4vw, 32px); /* 端の余白：fluid */
+}
+html {
+  scroll-behavior: smooth;
+  /* コンテンツ幅でのフォントサイズ */
+  font-size: clamp(10px, calc(10px / 375px * 100vw), 21px);
+  max-width: var(--page-max);
+  margin-left: auto;
+  margin-right: auto;
+}
+@media screen and (min-width: 768px) {
+  html {
+    font-size: clamp(1px, calc(10px / var(--container-max) * 100vw), 10px);
+  }
+}
+body {
+  max-width: var(--page-max);
+  min-width: var(--min-page);
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 0 8px rgba(33, 33, 33, 0.5);
+}
+
+html,
+body {
+  /* height: 100%; */
+}
+
+/* 画面全体ラッパー */
+.l-app {
+  min-height: 100vh;
+  box-sizing: border-box;
+
+  /* iOSのノッチ・ホームバー分の安全マージン */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+/* 必要なら、背景色やレイアウト全体をここで指定 */
+.l-app {
+  background-color: #fff;
+  /* 例：全体のレイアウト調整など */
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+a {
+  transition: 0.3s;
+}
+a:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+/************************************************
+    レスポンシブ */
+
+@media screen and (max-width: 767.98px) {
+  /* 変更点。0.02引く。 */
+  /* ここにSP向けのCSS指定 767.98px以下 */
+}
+@media screen and (min-width: 768px) {
+  /* ここにPC向けのCSS指定 768px以上 */
+}
+
+/************************************************
+    レスポンシブ */
+
+/* スマホファースト */
+
+@media screen and (min-width: 768px) {
+  /* スクリーンサイズが768px以上の場合に適用 */
+}
+
+@media screen and (min-width: 1200px) {
+  /* スクリーンサイズが1200px以上の場合に適用 */
+}
+
+/************************************************
+    レスポンシブ */
+
+/* PCファースト */
+
+@media screen and (max-width: 767px) {
+  /* ここに767ピクセル以下のモバイルデバイス向けのCSSスタイルを記述 */
+}

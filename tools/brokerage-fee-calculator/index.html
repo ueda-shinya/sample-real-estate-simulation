@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>仲介手数料シミュレーター サンプル</title>
+  <style>
+    :root {
+      --color-bg: #f5f7fb;
+      --color-surface: #ffffff;
+      --color-surface-sub: #f8fafc;
+      --color-border: #d8e1ee;
+      --color-text: #1f2937;
+      --color-text-sub: #5b6472;
+      --color-primary: #0f766e;
+      --color-primary-dark: #115e59;
+      --color-accent: #ecfeff;
+      --color-danger: #b91c1c;
+      --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      color: var(--color-text);
+      background: linear-gradient(180deg, #ecfffb 0%, var(--color-bg) 220px, var(--color-bg) 100%);
+      line-height: 1.7;
+    }
+
+    button, input, select { font: inherit; }
+
+    .l-page {
+      width: min(1080px, calc(100% - 32px));
+      margin-inline: auto;
+      padding: 32px 0 64px;
+    }
+
+    .c-hero {
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #effcf9 100%);
+      border: 1px solid rgba(15, 118, 110, 0.14);
+      border-radius: 28px;
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+    }
+
+    .c-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--color-accent);
+      color: var(--color-primary-dark);
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .c-hero__title {
+      margin: 16px 0 12px;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1.3;
+    }
+
+    .c-hero__lead {
+      margin: 0;
+      color: var(--color-text-sub);
+    }
+
+    .c-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.92fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .c-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .c-panel {
+      padding: 28px;
+    }
+
+    .c-panel__title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      line-height: 1.4;
+    }
+
+    .c-panel__lead {
+      margin: 0 0 24px;
+      color: var(--color-text-sub);
+      font-size: 0.95rem;
+    }
+
+    .c-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .c-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .c-field__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .c-field__label {
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .c-field__hint {
+      color: var(--color-text-sub);
+      font-size: 0.82rem;
+    }
+
+    .c-input,
+    .c-select {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid #c8d4e3;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--color-text);
+      transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+    }
+
+    .c-input:focus,
+    .c-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14);
+    }
+
+    .c-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 6px;
+    }
+
+    .c-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      min-height: 52px;
+      padding: 0 24px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .15s ease, background-color .2s ease;
+    }
+
+    .c-button:hover { transform: translateY(-1px); }
+
+    .c-button:focus-visible {
+      outline: 3px solid rgba(15, 118, 110, 0.2);
+      outline-offset: 2px;
+    }
+
+    .c-button--primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .c-button--primary:hover { background: var(--color-primary-dark); }
+
+    .c-button--secondary {
+      background: #e7f5f4;
+      color: var(--color-primary-dark);
+    }
+
+    .c-resultCard {
+      position: sticky;
+      top: 24px;
+      padding: 28px;
+    }
+
+    .c-summary {
+      margin-bottom: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ecfffb 0%, #f8fffe 100%);
+      border: 1px solid #c8f0ea;
+    }
+
+    .c-summary__label {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+
+    .c-summary__value {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
+    .c-breakdown {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .c-breakdown__item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      background: var(--color-surface-sub);
+    }
+
+    .c-breakdown__term {
+      margin: 0;
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .c-breakdown__desc {
+      margin: 2px 0 0;
+      color: var(--color-text-sub);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .c-breakdown__value {
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .c-note {
+      margin: 0;
+      color: var(--color-text-sub);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .c-tableWrap {
+      overflow-x: auto;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+    }
+
+    .c-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    .c-table th,
+    .c-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--color-border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.92rem;
+    }
+
+    .c-table th {
+      background: #f5fbfa;
+      font-weight: 700;
+    }
+
+    .c-table tr:last-child td { border-bottom: none; }
+
+    .u-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    .is-invalid {
+      border-color: var(--color-danger);
+      background: #fff8f8;
+    }
+
+    .c-error {
+      margin: 4px 0 0;
+      font-size: 0.83rem;
+      color: var(--color-danger);
+      font-weight: 700;
+    }
+
+    @media (max-width: 920px) {
+      .c-grid { grid-template-columns: 1fr; }
+      .c-resultCard { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      .l-page { width: min(100% - 20px, 1080px); padding-top: 20px; }
+      .c-hero, .c-panel, .c-resultCard { padding: 20px; }
+      .c-actions { flex-direction: column; }
+      .c-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="l-page">
+    <section class="c-hero" aria-labelledby="hero-title">
+      <span class="c-hero__badge">SAMPLE PAGE</span>
+      <h1 class="c-hero__title" id="hero-title">仲介手数料シミュレーター</h1>
+      <p class="c-hero__lead">
+        売却価格を入力すると、一般的な上限式ベースで仲介手数料（税込概算）を自動計算するサンプルページです。デザイン確認や導線のたたき台として使える簡易版です。
+      </p>
+    </section>
+
+    <div class="c-grid">
+      <section class="c-card c-panel" aria-labelledby="form-title">
+        <h2 class="c-panel__title" id="form-title">条件を入力してください</h2>
+        <p class="c-panel__lead">
+          このサンプルでは、売却価格から仲介手数料の上限目安を算出します。計算しやすいように、価格は「万円」で入力する仕様にしています。
+        </p>
+
+        <form class="c-form" id="brokerageFeeForm" novalidate>
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="salePrice">売却価格</label>
+              <span class="c-field__hint">万円で入力</span>
+            </div>
+            <input class="c-input js-required js-number" id="salePrice" name="salePrice" type="number" inputmode="decimal" min="0" step="1" value="3500" aria-describedby="salePriceError">
+            <p class="c-error u-hidden" id="salePriceError"></p>
+          </div>
+
+          <div class="c-field">
+            <div class="c-field__head">
+              <label class="c-field__label" for="propertyType">物件種別</label>
+              <span class="c-field__hint">表示用の補助項目です</span>
+            </div>
+            <select class="c-select js-required" id="propertyType" name="propertyType" aria-describedby="propertyTypeError">
+              <option value="マンション">マンション</option>
+              <option value="戸建て">戸建て</option>
+              <option value="土地">土地</option>
+              <option value="その他">その他</option>
+            </select>
+            <p class="c-error u-hidden" id="propertyTypeError"></p>
+          </div>
+
+          <div class="c-actions">
+            <button class="c-button c-button--primary" type="submit">仲介手数料を計算する</button>
+            <button class="c-button c-button--secondary" type="button" id="resetButton">初期値に戻す</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="c-card c-resultCard" aria-labelledby="result-title">
+        <h2 class="c-panel__title" id="result-title">計算結果</h2>
+        <p class="c-panel__lead">一般的な上限式ベースの概算です。</p>
+
+        <div class="c-summary" aria-live="polite" aria-atomic="true">
+          <p class="c-summary__label">仲介手数料（税込概算）</p>
+          <p class="c-summary__value" id="brokerageFeeTotal">-</p>
+        </div>
+
+        <div class="c-breakdown">
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">売却価格</p>
+              <p class="c-breakdown__desc">入力した売却価格です。</p>
+            </div>
+            <div class="c-breakdown__value" id="salePriceView">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">消費税抜き手数料</p>
+              <p class="c-breakdown__desc">価格帯に応じた上限式で計算しています。</p>
+            </div>
+            <div class="c-breakdown__value" id="brokerageFeeBase">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">消費税相当額</p>
+              <p class="c-breakdown__desc">税率10%で概算しています。</p>
+            </div>
+            <div class="c-breakdown__value" id="brokerageFeeTax">-</div>
+          </div>
+          <div class="c-breakdown__item">
+            <div>
+              <p class="c-breakdown__term">対象物件</p>
+              <p class="c-breakdown__desc">選択した物件種別の表示です。</p>
+            </div>
+            <div class="c-breakdown__value" id="propertyTypeView">-</div>
+          </div>
+        </div>
+
+        <p class="c-note" id="formulaNote">400万円超は「売買価格 × 3% + 6万円」に消費税を加えた概算です。</p>
+      </aside>
+    </div>
+
+    <section class="c-card c-panel" aria-labelledby="table-title" style="margin-top:24px;">
+      <h2 class="c-panel__title" id="table-title">計算ロジックの目安</h2>
+      <p class="c-panel__lead">
+        サンプルでは、一般的に使われる上限式をそのままわかりやすく表示しています。本番で公開する場合は、低廉な空家等の特例や注意文も別途入れる設計が安全です。
+      </p>
+      <div class="c-tableWrap">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>売却価格帯</th>
+              <th>税抜き仲介手数料の上限目安</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>200万円以下</td>
+              <td>売却価格 × 5%</td>
+            </tr>
+            <tr>
+              <td>200万円超〜400万円以下</td>
+              <td>売却価格 × 4% + 2万円</td>
+            </tr>
+            <tr>
+              <td>400万円超</td>
+              <td>売却価格 × 3% + 6万円</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const form = document.getElementById('brokerageFeeForm');
+      const resetButton = document.getElementById('resetButton');
+      const defaultValues = {
+        salePrice: '3500',
+        propertyType: 'マンション'
+      };
+
+      const resultNodes = {
+        brokerageFeeTotal: document.getElementById('brokerageFeeTotal'),
+        salePriceView: document.getElementById('salePriceView'),
+        brokerageFeeBase: document.getElementById('brokerageFeeBase'),
+        brokerageFeeTax: document.getElementById('brokerageFeeTax'),
+        propertyTypeView: document.getElementById('propertyTypeView'),
+        formulaNote: document.getElementById('formulaNote')
+      };
+
+      function parseNumber(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : NaN;
+      }
+
+      function toYenFromMan(valueMan) {
+        return Math.round(Number(valueMan || 0) * 10000);
+      }
+
+      function formatYen(value) {
+        return Math.round(value || 0).toLocaleString('ja-JP') + '円';
+      }
+
+      function validateField(input) {
+        const errorNode = document.getElementById(input.id + 'Error');
+        let message = '';
+        const value = input.value.trim();
+
+        if (input.classList.contains('js-required') && value === '') {
+          message = 'この項目は必須です。';
+        } else if (input.classList.contains('js-number')) {
+          const numericValue = parseNumber(value);
+          if (Number.isNaN(numericValue)) {
+            message = '数値で入力してください。';
+          } else if (numericValue < 0) {
+            message = '0以上の数値で入力してください。';
+          }
+        }
+
+        if (message) {
+          input.classList.add('is-invalid');
+          errorNode.textContent = message;
+          errorNode.classList.remove('u-hidden');
+          input.setAttribute('aria-invalid', 'true');
+          return false;
+        }
+
+        input.classList.remove('is-invalid');
+        errorNode.textContent = '';
+        errorNode.classList.add('u-hidden');
+        input.removeAttribute('aria-invalid');
+        return true;
+      }
+
+      function validateForm() {
+        const fields = form.querySelectorAll('.js-required');
+        let isValid = true;
+        fields.forEach(function (field) {
+          if (!validateField(field)) {
+            isValid = false;
+          }
+        });
+        return isValid;
+      }
+
+      function calculateBrokerageFeeBase(salePriceYen) {
+        if (salePriceYen <= 0) {
+          return { baseFee: 0, formula: '売却価格を入力してください。' };
+        }
+
+        if (salePriceYen <= 2000000) {
+          return {
+            baseFee: Math.round(salePriceYen * 0.05),
+            formula: '200万円以下のため「売却価格 × 5%」で計算しています。'
+          };
+        }
+
+        if (salePriceYen <= 4000000) {
+          return {
+            baseFee: Math.round(salePriceYen * 0.04 + 20000),
+            formula: '200万円超〜400万円以下のため「売却価格 × 4% + 2万円」で計算しています。'
+          };
+        }
+
+        return {
+          baseFee: Math.round(salePriceYen * 0.03 + 60000),
+          formula: '400万円超のため「売却価格 × 3% + 6万円」で計算しています。'
+        };
+      }
+
+      function calculateAndRender() {
+        if (!validateForm()) {
+          return;
+        }
+
+        const salePriceMan = parseNumber(form.salePrice.value);
+        const propertyType = form.propertyType.value;
+        const salePriceYen = toYenFromMan(salePriceMan);
+        const brokerage = calculateBrokerageFeeBase(salePriceYen);
+        const tax = Math.round(brokerage.baseFee * 0.1);
+        const total = brokerage.baseFee + tax;
+
+        resultNodes.brokerageFeeTotal.textContent = formatYen(total);
+        resultNodes.salePriceView.textContent = formatYen(salePriceYen);
+        resultNodes.brokerageFeeBase.textContent = formatYen(brokerage.baseFee);
+        resultNodes.brokerageFeeTax.textContent = formatYen(tax);
+        resultNodes.propertyTypeView.textContent = propertyType;
+        resultNodes.formulaNote.textContent = brokerage.formula + ' 消費税相当額は10%で概算しています。';
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        calculateAndRender();
+      });
+
+      form.querySelectorAll('input, select').forEach(function (field) {
+        field.addEventListener('input', function () {
+          validateField(field);
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+        field.addEventListener('change', function () {
+          validateField(field);
+          if (validateForm()) {
+            calculateAndRender();
+          }
+        });
+      });
+
+      resetButton.addEventListener('click', function () {
+        Object.keys(defaultValues).forEach(function (key) {
+          form.elements[key].value = defaultValues[key];
+        });
+
+        form.querySelectorAll('.js-required').forEach(function (input) {
+          input.classList.remove('is-invalid');
+          input.removeAttribute('aria-invalid');
+          const errorNode = document.getElementById(input.id + 'Error');
+          errorNode.textContent = '';
+          errorNode.classList.add('u-hidden');
+        });
+
+        calculateAndRender();
+      });
+
+      calculateAndRender();
+    }());
+  </script>
+</body>
+</html>
